@@ -1,0 +1,238 @@
+![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
+
+# Halia
+### JavaScript Plugin Manager
+
+-  **Plugins**:  Use "Plugins" to encapsulate features (instead of spreading them around your codebase).
+-  **Dependencies**:  Manage dependencies between the features in your app.
+-  **On-Demand**:  Build module "Stacks" as needed (at runtime).
+-  **Extensible**:  Extend the "Halia Core" with a customizable set of Plugins.
+
+## Overview
+
+Halia is a "Plugin Manager" used to encapsulate app-level features, automatically manage dependencies, and ultimately, build an extensible, modular app.
+
+A Halia "Plugin" is a named function which "installs" functionality once its dependencies are met.  The function also returns a "Feature API" object which is injected into downstream dependencies.
+
+## Installation
+
+Install with NPM:
+
+`npm i --save git+ssh://git@github.com:CodalReef/Halia.git`
+
+Install with Yarn:
+
+`yarn add git+ssh://git@github.com:CodalReef/Halia.git`
+
+## Example
+You have a duck that everyone loves:
+
+```typescript
+//  duck-app.ts
+export const getDuck = () => {
+  return "Quack";
+}
+```
+
+Everyone except Paul.  Paul wants a special **🦄 Disco Duck 🦄**, so you make an update:
+
+```typescript
+//  duck-app.ts
+import { Paul } from 'client-list';
+import { config } from 'config';
+export const getDuck = () => {
+  if (params.client === Paul) {
+    return "Michael Quackson";
+  }
+  return "Quack";
+}
+```
+
+When the client runs the code, it works!  But, the code has been coupled with the "client" concept.
+
+Instead, we can use a Plugin to encapsulate and inject this feature:
+
+```typescript
+//  duck-app-plugin.ts
+import * as DuckApp from './duck-app';
+export const DuckAppPlugin: HaliaPlugin = {
+  id: "duckApp",
+  name: "Duck App Plugin",
+  install: () => ({
+    setGetDuck: (getDuck) => DuckApp.getDuck = getDuck
+  })
+}
+```
+
+```typescript
+//  disco-duck-plugin.ts
+import { Paul } from 'client-list';
+import * as config from 'config';
+export const DiscoDuckPlugin: HaliaPlugin = {
+  id: "discoDuck",
+  name: "Disco Duck Plugin",
+  dependencies: [DuckAppPlugin.id],
+  install: ({ duckApp }) => {
+    if (config.client === Paul) {
+      duckApp.setGetDuck (() => "Michael Quackson")
+    }
+  }
+}
+```
+
+
+
+Then you can invoke the code as follows:
+
+
+```typescript
+//  main.ts
+import { HaliaStack } from Halia;
+import { DuckApp } from './DuckApp';
+import { DiscoFeature } from './DiscoFeature';
+
+const buildApp = async () => {
+
+  //  Initialize the Stack
+  const appStack = new HaliaStack();
+
+  //  Register Plugins
+  appStack.register(DuckApp);
+  appStack.register(DiscoFeature);
+
+  //  Build the Stack
+  await appStack.build();
+
+  //  Call the Method
+  const duckApp = appStack.getExports(DuckApp.id);
+  duckApp.logNoise();
+}
+
+buildApp();
+```
+
+With this, the original code is left in-tact, and we have a cleaner, de-coupled solution.  If the client no longer wants the **🦄 Disco Duck 🦄**  we just don't register the Plugin.  If they need an additional change, we have a namespace dedicated to their needs.
+
+This pattern isn't specific to Halia, and can be accomplished in vanilla JS.  However, as the number of dependencies grows and use-cases evolve, several problems emerge.
+
+-  **Import Complexity**:  You need to manage import order, which can become complex and difficult to refactor.
+-  **Singleton Guarantee**:  There's no guarantee the loaded module is a Singleton.
+-  **Dependency Verification**:  It's your responsibility to ensure dependencies are met prior to installation.
+-  **Delayed Installation**:  You'll need to manually manage installation if it occurs after initial load.
+
+As an on-demand, app-level dependency manager, Halia helps solve these problems.
+
+## Usage
+
+### Plugins
+
+Define a Plugin for each feature you wish to encapsulate.  You determine what each Plugin does and what API is exported for dependencies to use.
+
+>  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation whenever possible.  
+
+```typescript
+export const MyPlugin: HaliaPlugin = {
+  id: "myPlugin",             //  Unique Identifier 
+  name: "My Plugin",          //  Human Readable Name
+  description: "My Plugin!",  //  Human Readable Description
+  dependencies: [],           //  Array of Plugin Identifiers
+  install: (imports) => {     //  Function to "Install" this Plugin
+    return {};                //  Return an API Dependencies to Use
+  }
+}
+```
+
+###  Stacks
+
+A "Stack" is a program built at run-time using several Halia Plugins.
+
+```typescript
+//  Initialize the Stack
+const stack = new HaliaStack();
+
+//  Register Plugins
+stack.register(App);
+stack.register(Feature1);
+stack.register(Feature1_1);
+stack.register(Feature2);
+// etc...
+
+//  Build the Stack
+await stack.build();
+
+//  Extract an Export
+const f1Exports = stack.getExports(Feature1.id);
+
+//  Extract a Plugin
+const f1Plugin = stack.getPlugin(Feature1.id);
+```
+
+At this point, `stack` is an initialized instance of your module set.  It may be a program, or perhaps a feature to be further nested in another Halia Stack.
+
+To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
+
+
+## Principles
+
+### Responsibility
+Each Plugin is responsible for the valid use of the imported APIs.  Without a standard mechanism to enforce or define "valid" use, the responsibility is deferred to the Plugin developers.  For this reason, it's important to understand the usage rules and limitations of each imported API and your own.  However, a Plugin is not responsible for the validity of its dependencies.
+
+##  Problems
+
+While using Halia (or any Plugin manager) you might encounter several common problems.  Most of these can be solved by applying one or more design patterns.
+
+### Incompatibility
+An "Incompatibility" exists between two or more Plugins which cannot co-exist.  For example, when installed together, the functionality of the system may be invalid compared to the expected functional state.  To solve this problem, try the following suggestions:
+
+-  Remove one of the Plugins.
+-  Update one of the Plugins to fix the incompatibility.
+-  Build a new "Coupling Plugin" to fix the incompatibility.
+-  Update the dependency APIs to support the Plugins.
+
+## Patterns
+
+These are common patterns you can apply to help you build robust, modular systems.
+
+###  Coupling Plugin
+A "Coupling Plugin" is used to correct invalid or missing functionality that results from an incompatibility.
+
+For example, imagine we add two new Plugins, "Video" and "Messaging".  Assuming they both inject themselves with the same API, it's possible they'd overwrite one another.  To solve this, we can build a new "Coupling Plugin", perhaps called "VideoMessaging", to inject the necessary patch.
+
+This approach can be useful, but it's good practice to keep Plugins independent and compatible.  This helps control feature "fan-out" and keeps combinatorial explosion in check.
+
+## Extensions
+
+Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be used for building several augmentations onto Halia.  Some ideas include:
+
+-  Incompatibility Management
+-  Cyclic Dependencies
+-  Plugin Inheritance
+-  Plugin Overloads
+-  API Transformers
+-  Additional Passes / Channels
+-  External Integration
+
+
+## More Info
+
+### Package Managers (like npm ) vs. Halia
+
+NPM is a "Package Manager" used to manages static, package-level dependencies which typically stay constant between runs.
+
+Halia also manages dependencies, but the dependency tree can be built on-demand at runtime, and typically between "Features" in the application domain, not static libraries used to build features.
+
+Halia also has an "install" step, which enables Plugins to change the functionality of existing Plugins.
+
+Halia "Plugins" are similar to "Packages", and depending on your definition, Halia may be classified as a "Package Manager".  However, with the addition of runtime construction and first-class support for mutation, we feel the label "Plugin Manager" is more fitting.
+
+### Module Systems (like JS Modules) vs. Halia
+
+JS Modules is a "Module System" used to bundle code across the filesystem and map it to variables in the local scope (using "import" and "export" statements).
+
+In contrast, Halia automatically resolves dependencies between features without the need to manually manage import order.
+
+In addition, each Halia Plugin has a unique identifier which ensures it's registered as a singleton instance.
+
+### Attribution
+
+Halia is inspired by similar dependency injection tools (like Angular and Nest Providers), but de-coupled from the specific back-end and front-end technology.
