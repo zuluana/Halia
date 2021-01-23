@@ -24,103 +24,6 @@ Install with Yarn:
 
 `yarn add git+ssh://git@github.com:CodalReef/Halia.git`
 
-## Example
-You have a duck that everyone loves:
-
-```typescript
-//  duck-app.ts
-export const getDuck = () => {
-  return "Quack";
-}
-```
-
-Everyone except Paul.  Paul wants a special **🦄 Disco Duck 🦄**, so you make an update:
-
-```typescript
-//  duck-app.ts
-import { Paul } from 'client-list';
-import { config } from 'config';
-export const getDuck = () => {
-  if (params.client === Paul) {
-    return "Michael Quackson";
-  }
-  return "Quack";
-}
-```
-
-When the client runs the code, it works!  But, the code has been coupled with the "client" concept.
-
-Instead, we can use a Plugin to encapsulate and inject this feature:
-
-```typescript
-//  duck-app-plugin.ts
-import * as DuckApp from './duck-app';
-export const DuckAppPlugin: HaliaPlugin = {
-  id: "duckApp",
-  name: "Duck App Plugin",
-  install: () => ({
-    setGetDuck: (getDuck) => DuckApp.getDuck = getDuck
-  })
-}
-```
-
-```typescript
-//  disco-duck-plugin.ts
-import { Paul } from 'client-list';
-import * as config from 'config';
-export const DiscoDuckPlugin: HaliaPlugin = {
-  id: "discoDuck",
-  name: "Disco Duck Plugin",
-  dependencies: [DuckAppPlugin.id],
-  install: ({ duckApp }) => {
-    if (config.client === Paul) {
-      duckApp.setGetDuck (() => "Michael Quackson")
-    }
-  }
-}
-```
-
-
-
-Then you can invoke the code as follows:
-
-
-```typescript
-//  main.ts
-import { HaliaStack } from Halia;
-import { DuckApp } from './DuckApp';
-import { DiscoFeature } from './DiscoFeature';
-
-const buildApp = async () => {
-
-  //  Initialize the Stack
-  const appStack = new HaliaStack();
-
-  //  Register Plugins
-  appStack.register(DuckApp);
-  appStack.register(DiscoFeature);
-
-  //  Build the Stack
-  await appStack.build();
-
-  //  Call the Method
-  const duckApp = appStack.getExports(DuckApp.id);
-  duckApp.logNoise();
-}
-
-buildApp();
-```
-
-With this, the original code is left in-tact, and we have a cleaner, de-coupled solution.  If the client no longer wants the **🦄 Disco Duck 🦄**  we just don't register the Plugin.  If they need an additional change, we have a namespace dedicated to their needs.
-
-This pattern isn't specific to Halia, and can be accomplished in vanilla JS.  However, as the number of dependencies grows and use-cases evolve, several problems emerge.
-
--  **Import Complexity**:  You need to manage import order, which can become complex and difficult to refactor.
--  **Singleton Guarantee**:  There's no guarantee the loaded module is a Singleton.
--  **Dependency Verification**:  It's your responsibility to ensure dependencies are met prior to installation.
--  **Delayed Installation**:  You'll need to manually manage installation if it occurs after initial load.
-
-As an on-demand, app-level dependency manager, Halia helps solve these problems.
 
 ## Usage
 
@@ -172,33 +75,95 @@ At this point, `stack` is an initialized instance of your module set.  It may be
 To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
 
 
-## Principles
+## Example
+You have a duck that everyone loves:
 
-### Responsibility
-Each Plugin is responsible for the valid use of the imported APIs.  Without a standard mechanism to enforce or define "valid" use, the responsibility is deferred to the Plugin developers.  For this reason, it's important to understand the usage rules and limitations of each imported API and your own.  However, a Plugin is not responsible for the validity of its dependencies.
+```typescript
+//  duck-app.ts
+export const getDuck = () => {
+  return "Quack";
+}
+```
 
-##  Problems
+Everyone except Paul.  Paul wants a special **🦄 Disco Duck 🦄**, so you make an update:
 
-While using Halia (or any Plugin manager) you might encounter several common problems.  Most of these can be solved by applying one or more design patterns.
+```typescript
+//  duck-app.ts
+import { Paul } from 'client-list';
+import { config } from 'config';
+export const getDuck = () => {
+  if (params.client === Paul) {
+    return "Michael Quackson";
+  }
+  return "Quack";
+}
+```
 
-### Incompatibility
-An "Incompatibility" exists between two or more Plugins which cannot co-exist.  For example, when installed together, the functionality of the system may be invalid compared to the expected functional state.  To solve this problem, try the following suggestions:
+While the code works for Paul, it has become more complex, harder to read, and coupled with the "client" concept.
 
--  Remove one of the Plugins.
--  Update one of the Plugins to fix the incompatibility.
--  Build a new "Coupling Plugin" to fix the incompatibility.
--  Update the dependency APIs to support the Plugins.
+Instead, we can use a Halia Plugin to encapsulate and inject this feature:
 
-## Patterns
+```typescript
+//  duck-app-plugin.ts
+import * as DuckApp from './duck-app';
+export const DuckAppPlugin: HaliaPlugin = {
+  id: "duckApp",
+  name: "Duck App Plugin",
+  install: () => ({
+    setGetDuck: (getDuck) => DuckApp.getDuck = getDuck
+  })
+}
+```
 
-These are common patterns you can apply to help you build robust, modular systems.
+```typescript
+//  disco-duck-plugin.ts
+import { Paul } from 'client-list';
+import * as config from 'config';
+export const DiscoDuckPlugin: HaliaPlugin = {
+  id: "discoDuck",
+  name: "Disco Duck Plugin",
+  dependencies: [DuckAppPlugin.id],
+  install: ({ duckApp }) => {
+    if (config.client === Paul) {
+      duckApp.setGetDuck (() => "Michael Quackson")
+    }
+  }
+}
+```
 
-###  Coupling Plugin
-A "Coupling Plugin" is used to correct invalid or missing functionality that results from an incompatibility.
 
-For example, imagine we add two new Plugins, "Video" and "Messaging".  Assuming they both inject themselves with the same API, it's possible they'd overwrite one another.  To solve this, we can build a new "Coupling Plugin", perhaps called "VideoMessaging", to inject the necessary patch.
 
-This approach can be useful, but it's good practice to keep Plugins independent and compatible.  This helps control feature "fan-out" and keeps combinatorial explosion in check.
+Then we can build the stack and invoke the code:
+
+
+```typescript
+//  main.ts
+import { HaliaStack } from Halia;
+import { DuckApp } from './DuckApp';
+import { DiscoFeature } from './DiscoFeature';
+
+const buildApp = async () => {
+
+  //  Initialize the Stack
+  const appStack = new HaliaStack();
+
+  //  Register Plugins
+  appStack.register(DuckApp);
+  appStack.register(DiscoFeature);
+
+  //  Build the Stack
+  await appStack.build();
+
+  //  Call the Method
+  const duckApp = appStack.getExports(DuckApp.id);
+  duckApp.logNoise();
+}
+
+buildApp();
+```
+
+With this, the original code is left in-tact and de-coupled.  If the client no longer wants the **🦄 Disco Duck 🦄**  we just don't register the Plugin.  If they need an additional change, we have a namespace dedicated to their needs.
+
 
 ## Extensions
 
@@ -232,6 +197,46 @@ JS Modules is a "Module System" used to bundle code across the filesystem and ma
 In contrast, Halia automatically resolves dependencies between features without the need to manually manage import order.
 
 In addition, each Halia Plugin has a unique identifier which ensures it's registered as a singleton instance.
+
+### Vanilla JS vs. Halia
+
+You don't need Halia to implement the "Plugin Manager" pattern.  However, as the number of dependencies grows and use-cases evolve, several problems emerge.
+
+-  **Import Complexity**:  You need to manage import order, which can become complex and difficult to refactor.
+-  **Singleton Guarantee**:  There's no guarantee the loaded module is a Singleton.
+-  **Dependency Verification**:  It's your responsibility to ensure dependencies are met prior to installation.
+-  **Delayed Installation**:  You'll need to manually manage installation if it occurs after initial load.
+
+As an on-demand, app-level dependency manager, Halia helps solve these problems.
+
+### Principles
+
+#### Responsibility
+Each Plugin is responsible for the valid use of the imported APIs.  Without a standard mechanism to enforce or define "valid" use, the responsibility is deferred to the Plugin developers.  For this reason, it's important to understand the usage rules and limitations of each imported API and your own.  However, a Plugin is not responsible for the validity of its dependencies.
+
+###  Problems
+
+While using Halia (or any Plugin manager) you might encounter several common problems.  Most of these can be solved by applying one or more design patterns.
+
+#### Incompatibility
+An "Incompatibility" exists between two or more Plugins which cannot co-exist.  For example, when installed together, the functionality of the system may be invalid compared to the expected functional state.  To solve this problem, try the following suggestions:
+
+-  Remove one of the Plugins.
+-  Update one of the Plugins to fix the incompatibility.
+-  Build a new "Coupling Plugin" to fix the incompatibility.
+-  Update the dependency APIs to support the Plugins.
+
+### Patterns
+
+These are common patterns you can apply to help you build robust, modular systems.
+
+####  Coupling Plugin
+A "Coupling Plugin" is used to correct invalid or missing functionality that results from an incompatibility.
+
+For example, imagine we add two new Plugins, "Video" and "Messaging".  Assuming they both inject themselves with the same API, it's possible they'd overwrite one another.  To solve this, we can build a new "Coupling Plugin", perhaps called "VideoMessaging", to inject the necessary patch.
+
+This approach can be useful, but it's good practice to keep Plugins independent and compatible.  This helps control feature "fan-out" and keeps combinatorial explosion in check.
+
 
 ### Attribution
 
