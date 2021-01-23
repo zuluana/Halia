@@ -8,7 +8,6 @@
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
     "test": "mocha ./dist/test/**/*.test.js",
-    "watch-test": "npm run test -- --watchAll",
     "build-ts": "tsc --declaration",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "prepare": "npm run build",
@@ -20,13 +19,9 @@
     "@types/node": "^9.6.55",
     "chai": "^4.2.0",
     "expect": "^24.1.0",
-    "lodash": "^4.17.5",
     "mocha": "^5.2.0",
     "ts-node": "^5.0.0",
     "tslint": "^5.12.1",
     "typescript": "^3.5.3"
-  },
-  "dependencies": {
-    "expo": "^36.0.2"
   }
 }
