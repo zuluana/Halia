@@ -12,7 +12,7 @@
 
 Halia is a "Plugin Manager" used to encapsulate app-level features, automatically manage dependencies, and ultimately, build an extensible, modular app.
 
-A Halia "Plugin" is a named function which "installs" functionality once its dependencies are met.  The function also returns a "Feature API" object which is injected into downstream dependencies.
+A Halia "Plugin" is a named function which "installs" functionality once its dependencies are met.  The function also returns a "Plugin API" object which is injected into downstream dependencies.
 
 ## Installation
 
@@ -40,7 +40,7 @@ export const MyPlugin: HaliaPlugin = {
   description: "My Plugin!",  //  Human Readable Description
   dependencies: [],           //  Array of Plugin Identifiers
   install: (imports) => {     //  Function to "Install" this Plugin
-    return {};                //  Return an API Dependencies to Use
+    return {};                //  Return a "Plugin API" for Downstream Dependencies
   }
 }
 ```
