@@ -170,6 +170,10 @@ To extract a Plugin or Exported API from a stack use the `getExports` and `getPl
 
 Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be used for building several augmentations onto Halia.  Some ideas include:
 
+-  Plugin Configuration
+
+>  This is being considered as a core feature.
+> 
 -  Incompatibility Management
 -  Cyclic Dependencies
 -  Plugin Inheritance
@@ -201,14 +205,25 @@ In addition, each Halia Plugin has a unique identifier which ensures it's regist
 
 ### Vanilla JS vs. Halia
 
-You don't need Halia to implement the "Plugin Manager" pattern.  However, as the number of dependencies grows and use-cases evolve, several problems emerge.
+You don't need Halia to implement the "Plugin Manager" pattern.  However, as the number of dependencies grows and use-cases evolve, several problems emerge:
 
--  **Import Complexity**:  You need to manage import order, which can become complex and difficult to refactor.
+-  **Import Order**:  You need to manage import order, which can become complex and difficult to refactor.
 -  **Singleton Guarantee**:  There's no guarantee the loaded module is a Singleton.
 -  **Dependency Verification**:  It's your responsibility to ensure dependencies are met prior to installation.
 -  **Delayed Installation**:  You'll need to manually manage installation if it occurs after initial load.
+-  **Dynamic Modification**: If the set of “Features” changes at runtime, you'll need to manage that change.  For example, verifying module compatibility.
 
-As an on-demand, app-level dependency manager, Halia helps solve these problems.
+With Halia, the complete dependency graph is built at build-time, so there's no need to manually order them, just declare their existence.  
+
+Each Plugin has a unique ID to which a singleton instance is associated.  If the same ID is used twice, an error is thrown.
+
+>  We hope to support versioned Plugins in the future.  Possibly through a Core Plugin.
+
+A Plugin will not be installed unless all dependencies were installed successfully.
+
+>  We hope to make this configurable, perhaps globally, per Plugin, with an injected config function, etc.
+
+Halia Stacks can be built on-demand (and re-built) as needed.  This means, if the feature set changes at runtime, we can re-build the stack and run again.
 
 ### Principles
 
