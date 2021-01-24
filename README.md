@@ -176,7 +176,7 @@ Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be use
 -  API Transformers
 -  Additional Passes / Channels
 -  External Integration
-
+-  Multiple exports for different "Targets".
 
 ## More Info
 
