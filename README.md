@@ -4,7 +4,7 @@
 ### JS / TS Plugin Manager - Build Extensible, Modular Apps
 
 
-Build "Plugins" to encapsulate and inject features into your app instead of spreading them around the codebase.
+Use "Plugins" to encapsulate and inject features instead of spreading them around the codebase.
 
 Your Plugin may depend upon other Plugins, and once they're installed, your Plugin's "install" function is invoked with the APIs exported by the dependencies.
 
