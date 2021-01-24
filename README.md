@@ -25,56 +25,6 @@ Install with Yarn:
 `yarn add git+ssh://git@github.com:CodalReef/Halia.git`
 
 
-## Usage
-
-### Plugins
-
-Define a Plugin for each feature you wish to encapsulate.  You determine what each Plugin does and what API is exported for dependencies to use.
-
->  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation whenever possible.  
-
-```typescript
-export const MyPlugin: HaliaPlugin = {
-  id: "myPlugin",             //  Unique Identifier 
-  name: "My Plugin",          //  Human Readable Name
-  description: "My Plugin!",  //  Human Readable Description
-  dependencies: [],           //  Array of Plugin Identifiers
-  install: (imports) => {     //  Function to "Install" this Plugin
-    return {};                //  Return a "Plugin API" for Downstream Dependencies
-  }
-}
-```
-
-###  Stacks
-
-A "Stack" is a program built at run-time using several Halia Plugins.
-
-```typescript
-//  Initialize the Stack
-const stack = new HaliaStack();
-
-//  Register Plugins
-stack.register(App);
-stack.register(Feature1);
-stack.register(Feature1_1);
-stack.register(Feature2);
-// etc...
-
-//  Build the Stack
-await stack.build();
-
-//  Extract an Export
-const f1Exports = stack.getExports(Feature1.id);
-
-//  Extract a Plugin
-const f1Plugin = stack.getPlugin(Feature1.id);
-```
-
-At this point, `stack` is an initialized instance of your module set.  It may be a program, or perhaps a feature to be further nested in another Halia Stack.
-
-To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
-
-
 ## Example
 You have a duck that everyone loves:
 
@@ -163,6 +113,56 @@ buildApp();
 ```
 
 With this, the original code is left in-tact and de-coupled.  If the client no longer wants the **🦄 Disco Duck 🦄**  we just don't register the Plugin.  If they need an additional change, we have a namespace dedicated to their needs.
+
+
+## Usage
+
+### Plugins
+
+Define a Plugin for each feature you wish to encapsulate.  You determine what each Plugin does and what API is exported for dependencies to use.
+
+>  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation whenever possible.  
+
+```typescript
+export const MyPlugin: HaliaPlugin = {
+  id: "myPlugin",             //  Unique Identifier 
+  name: "My Plugin",          //  Human Readable Name
+  description: "My Plugin!",  //  Human Readable Description
+  dependencies: [],           //  Array of Plugin Identifiers
+  install: (imports) => {     //  Function to "Install" this Plugin
+    return {};                //  Return a "Plugin API" for Downstream Dependencies
+  }
+}
+```
+
+###  Stacks
+
+A "Stack" is a program built at run-time using several Halia Plugins.
+
+```typescript
+//  Initialize the Stack
+const stack = new HaliaStack();
+
+//  Register Plugins
+stack.register(App);
+stack.register(Feature1);
+stack.register(Feature1_1);
+stack.register(Feature2);
+// etc...
+
+//  Build the Stack
+await stack.build();
+
+//  Extract an Export
+const f1Exports = stack.getExports(Feature1.id);
+
+//  Extract a Plugin
+const f1Plugin = stack.getPlugin(Feature1.id);
+```
+
+At this point, `stack` is an initialized instance of your module set.  It may be a program, or perhaps a feature to be further nested in another Halia Stack.
+
+To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
 
 
 ## Extensions
