@@ -3,14 +3,13 @@
 # Halia
 ### JS / TS Plugin Manager - Build Extensible, Modular Apps
 
-
 Use "Plugins" to encapsulate and inject features instead of spreading them around the codebase.
 
-Your Plugin may depend upon other Plugins, and once they're installed, your Plugin's "install" function is invoked with the APIs exported by the dependencies.
+Your Plugin may depend upon other Plugins, and once they're installed, your Plugin's "install" function is invoked with the APIs exported by its dependencies.
 
-Your Plugin can them use these APIs to augment existing functionality.  It may then export its own "Plugin API" for down-stream consumers.
+Your Plugin can then use these APIs to augment existing functionality. It may then export its own "Plugin API" for down-stream consumers.
 
-The set of installed Plugins can be changed at runtime and the app re-built.  Halia is itself, a Halia Plugin, so it's open for extension.
+The set of installed Plugins can be changed at runtime and the app re-built. Halia is itself, a Halia Plugin, so it's open for extension.
 
 ## Installation
 
