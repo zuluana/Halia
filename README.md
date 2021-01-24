@@ -1,18 +1,16 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### JavaScript Plugin Manager
+### JS / TS Plugin Manager - Build Extensible, Modular Apps
 
--  **Plugins**:  Use "Plugins" to encapsulate features (instead of spreading them around your codebase).
--  **Dependencies**:  Manage dependencies between the features in your app.
--  **On-Demand**:  Build module "Stacks" as needed (at runtime).
--  **Extensible**:  Extend the "Halia Core" with a customizable set of Plugins.
 
-## Overview
+Build "Plugins" to encapsulate and inject features into your app instead of spreading them around the codebase.
 
-Halia is a "Plugin Manager" used to encapsulate app-level features, automatically manage dependencies, and ultimately, build an extensible, modular app.
+Each Plugin may depend on other Plugins.  When a Plugin's dependencies have been installed, Halia will call the Plugin's "install" function with the APIs exported by its dependencies.
 
-A Halia "Plugin" is a named function which "installs" functionality once its dependencies are met.  The function also returns a "Plugin API" object which is injected into downstream dependencies.
+The Plugin can then use these APIs to augment existing functionality and export its own "Plugin API".
+
+The set of installed Plugins can be changed at runtime and the app re-built.  Halia is itself, a Halia Plugin, so it's open for extension.
 
 ## Installation
 
