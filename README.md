@@ -7,7 +7,7 @@ Use "Plugins" to encapsulate and inject features instead of spreading them throu
 
 A Plugin may depend upon other Plugins.  Once a Plugin's dependencies are installed, its "install" function is invoked with the APIs exported by its dependencies.
 
-A Plugin can then use these APIs to augment existing functionality. It then exports its own "Plugin API" for down-stream consumers.
+Within the "install" function, these dependency APIs are used to augment existing functionality. The Plugin then exports its own "Plugin API" for down-stream consumers.
 
 The set of installed Plugins can be changed at runtime and the app re-built. Halia is itself, a Halia Plugin, so it's open for extension.
 
