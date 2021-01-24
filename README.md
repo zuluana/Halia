@@ -46,7 +46,7 @@ export const getDuck = () => {
 }
 ```
 
-While the code works for Paul, it has become more complex, harder to read, and coupled with the "client" concept.
+While the code works for Paul, it's become more complex, harder to read, and coupled with the "client" concept.
 
 Instead, we can use a Halia Plugin to encapsulate and inject this feature:
 
@@ -109,7 +109,11 @@ const buildApp = async () => {
 buildApp();
 ```
 
-With this, the original code is left in-tact and de-coupled.  If the client no longer wants the **🦄 Disco Duck 🦄**  we just don't register the Plugin.  If they need an additional change, we have a namespace dedicated to their needs.
+With this, the original code is left in-tact and de-coupled.
+
+If Paul longer wants the **🦄 Disco Duck 🦄**  we just don't register the Plugin.  If he needs an additional change, we have a namespace dedicated to his unique needs.
+
+>  This is a simple example that can be solved in other ways.  However, it demonstrates the general idea, and as features become more complex, we've found this pattern keeps things organized.
 
 
 ## Usage
