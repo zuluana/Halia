@@ -3,7 +3,7 @@
 # Halia
 ### JS / TS Plugin Manager - Build Extensible, Modular Apps
 
-Use "Plugins" to encapsulate and inject features instead of spreading them throughout the codebase.
+Use "Plugins" to encapsulate and inject features instead of spreading them throughout the codebase.  Halia is a lightweight package for declaring "Plugins" and managing their lifecycle.
 
 A Plugin may depend upon other Plugins.  Once a Plugin's dependencies are installed, its "install" function is invoked with the APIs exported by its dependencies.
 
