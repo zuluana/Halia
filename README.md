@@ -5,7 +5,7 @@
 
 Use "Plugins" to encapsulate and inject features instead of spreading them around the codebase.
 
-Your Plugin may depend upon other Plugins, and once they're installed, your Plugin's "install" function is invoked with the APIs exported by its dependencies.
+A Plugin may depend upon other Plugins, and once the dependencies are installed, the Plugin's "install" function is invoked with the APIs exported by the dependencies.
 
 Your Plugin can then use these APIs to augment existing functionality. It may then export its own "Plugin API" for down-stream consumers.
 
