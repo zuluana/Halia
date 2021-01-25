@@ -1,19 +1,19 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### TS / JS Extensible Dependency Injector
+### TS / JS Dependency Injector (DI)
 
-**Build extensible "Plugins" to encapsulate and inject features instead of spreading them around your codebase.**
+**Build "Plugins" to encapsulate and inject features instead of spreading them around your codebase.**
 
-Halia is an extensible, lightweight package used to build modular, extensible systems.  Write "Plugins" to centralize features and inject them into your App (or other Plugins).
+Halia is an extensible, lightweight DI tool used to build extensible, modular systems.  Write "Plugins" to centralize features and inject them into your App (or other Plugins).
 
-Unlike other DI solutions, Halia prioritizes "extensibility".  Each Plugin has an "install" phase where it installs itself into its dependencies then exports its own API.
+To differentiate from existing DI solutions, Halia prioritizes "extensibility".  Each Plugin has an "install" phase where it initializes itself **and** injects functionality back into its dependencies.  It then exports its own API for downstream Plugins to inject back into it.
 
-The **intent** of the Halia DI package is to be used as a "Plugin Manager".  Where a standard DI solution includes modules which initialize themselves, Halia Plugins are stateful and initialize themselves and inject **back** into their dependencies.
+For more information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#More Info).
 
-#### Overview
+#### Plugin Overview
 
-A Plugin may depend upon other Plugins.  Once a Plugin's dependencies are installed, its "install" function is invoked with the APIs exported by its dependencies.
+Each Plugin may depend upon other Plugins.  Once a Plugin's dependencies are installed, its "install" function is invoked with the "Plugin APIs" exported by its dependencies.
 
 Use these dependency APIs to predictably augment existing functionality. Then, export your own "Plugin API" for down-stream consumers.
 
@@ -21,7 +21,7 @@ The set of installed Plugins can be changed at runtime and the app re-built. Hal
 
 ## Installation
 
-Install with NPM:
+Install with npm:
 
 `npm i --save git+ssh://git@github.com:CodalReef/Halia.git`
 
@@ -130,7 +130,7 @@ If Paul longer wants the **🦄 Disco Duck 🦄**  we just don't register the Pl
 
 Define a Plugin for each feature you wish to encapsulate.  You determine what each Plugin does and what API is exported for dependencies to use.
 
->  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation whenever possible.  
+>  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation when possible.  
 
 ```typescript
 export const MyPlugin: HaliaPlugin = {
@@ -169,7 +169,7 @@ const f1Exports = stack.getExports(Feature1.id);
 const f1Plugin = stack.getPlugin(Feature1.id);
 ```
 
-At this point, `stack` is an initialized instance of your module set.  It may be a program, or perhaps a feature to be further nested in another Halia Stack.
+At this point, `stack` is an initialized instance of your Plugin Set.  It may be a program, or perhaps a feature to be further nested in another Halia Stack.
 
 To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
 
@@ -183,8 +183,8 @@ To extract a Plugin or Exported API from a stack use the `getExports` and `getPl
 
 Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be used for building several augmentations onto Halia.  Some ideas include:
 
--  
 -  Incompatibility Management
+-  Global Injections
 -  Cyclic Dependencies
 -  Plugin Inheritance
 -  Plugin Overloads
@@ -193,7 +193,7 @@ Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be use
 -  External Integration
 -  Multiple exports for different "Targets".
 
-## More Info
+## (More-Info)
 
 ### Package Managers (like npm ) vs. Halia
 
@@ -236,11 +236,19 @@ A Plugin will not be installed unless all dependencies were installed successful
 Halia Stacks can be built on-demand (and re-built) as needed.  This means, if the feature set changes at runtime, we can re-build the stack and run again.
 
 ### Other DI Solutions vs. Halia
-Other DI Solutions, like Angular and Nest.js Providers can be used to solve a lot of the same problems.  However:
 
--  Halia can be extended with a selection of "Plugins".  You can write your own to mix and match functionality as needed.
--  Halia is not coupled with the front-end / back-end technology.
--  Extensibilty is a first-class concern, where every module is itself a "Plugin".
+Our *intent* is for Halia to be a generic, extensible Dependency Injection tool.  However, we see a lot of value in the "Plugin Pattern".  Therefore, extensibility is a first-class concern of ours, this this repo, and Halia Extensions.
+
+For example, while most DI solutions use a class constructor for initialization, we accept a standard JS Function.  This makes it possible to build an extension for "Asynchronous Installation".
+
+ However, you *can* use Halia as a standard DI solution without implementing the "Plugin Pattern" with back-installation. 
+
+Other DI Solutions, like Angular and Nest.js Providers can be used to solve a lot of the same problems, but with some key differences:
+
+
+-  **Extensible**:  Use existing (or build your own) "Halia Extensions" to install the features you need.  For example, add optional dependencies, incompatibility management, etc...
+-  **Independent**:  Halia is not coupled with a particular back-end or front-end technology.  But, with Halia Extensions, it can be made to work with most tech stacks.
+-  **Team**:  We have a deep interest in extensibility, cross-eco integration, cross-eco context, loose coupling, system staking, virtualized centralization, and lots more.  You can expect to see more of these concepts as we release extensions, associated packages, and posts.
 
 ### Principles
 
