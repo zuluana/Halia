@@ -166,14 +166,16 @@ At this point, `stack` is an initialized instance of your module set.  It may be
 To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
 
 
+##  Roadmap
+
+-  Plugin Configuration
+-  Consider exporting an Object OR specifically *a Plugin* from each Halia "Stack".
+
 ## Extensions
 
 Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be used for building several augmentations onto Halia.  Some ideas include:
 
--  Plugin Configuration
-
->  This is being considered as a core feature.
-> 
+-  
 -  Incompatibility Management
 -  Cyclic Dependencies
 -  Plugin Inheritance
