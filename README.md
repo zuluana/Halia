@@ -1,9 +1,17 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### JS / TS Plugin Manager - Build Extensible, Modular Apps
+### TS / JS Extensible Dependency Injector
 
-Use "Plugins" to encapsulate and inject features instead of spreading them throughout the codebase.  Halia is a lightweight package for declaring "Plugins" and managing their lifecycle.
+**Build extensible "Plugins" to encapsulate and inject features instead of spreading them around your codebase.**
+
+Halia is an extensible, lightweight package used to build modular, extensible systems.  Write "Plugins" to centralize features and inject them into your App (or other Plugins).
+
+Unlike other DI solutions, Halia prioritizes "extensibility".  Each Plugin has an "install" phase where it installs itself into its dependencies then exports its own API.
+
+The **intent** of the Halia DI package is to be used as a "Plugin Manager".  Where a standard DI solution includes modules which initialize themselves, Halia Plugins are stateful and initialize themselves and inject **back** into their dependencies.
+
+#### Overview
 
 A Plugin may depend upon other Plugins.  Once a Plugin's dependencies are installed, its "install" function is invoked with the APIs exported by its dependencies.
 
@@ -226,6 +234,13 @@ A Plugin will not be installed unless all dependencies were installed successful
 >  We hope to make this configurable, perhaps globally, per Plugin, with an injected config function, etc.
 
 Halia Stacks can be built on-demand (and re-built) as needed.  This means, if the feature set changes at runtime, we can re-build the stack and run again.
+
+### Other DI Solutions vs. Halia
+Other DI Solutions, like Angular and Nest.js Providers can be used to solve a lot of the same problems.  However:
+
+-  Halia can be extended with a selection of "Plugins".  You can write your own to mix and match functionality as needed.
+-  Halia is not coupled with the front-end / back-end technology.
+-  Extensibilty is a first-class concern, where every module is itself a "Plugin".
 
 ### Principles
 
