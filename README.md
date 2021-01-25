@@ -1,11 +1,11 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### TS / JS Dependency Injector (DI)
+### TS / JS Dependency Injector
 
 **Build "Plugins" to encapsulate and inject features instead of spreading them around your codebase.**
 
-Halia is an extensible, lightweight DI tool used to build extensible, modular systems.  Write "Plugins" to centralize features and inject them into your App (or other Plugins).
+Halia is an extensible, lightweight dependency injection (DI) tool used to build extensible, modular systems.  Write "Plugins" to centralize features and inject them into your App (or other Plugins).
 
 To differentiate from existing DI solutions, Halia prioritizes "extensibility".  Each Plugin has an "install" phase where it initializes itself **and** injects functionality back into its dependencies.  It then exports its own API for downstream Plugins to inject back into it.
 
