@@ -1,7 +1,7 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### TS / JS Extensible Dependency Injection
+### TS / JS Extensible Dependency Injector
 
 **Build "Plugins" to encapsulate and inject features instead of spreading them throughout the codebase.**
 
