@@ -15,17 +15,18 @@ Halia is a generic, extensible dependency injection (DI) framework.  However, we
 
 With this pattern, you encapsulate features as "Plugins" which are then injected into your app (or other plugins).  This keeps your code de-coupled, organized, and open for extension.  
 
-## Table of Contents
+## 📖 Table of Contents
 - [Introduction](#halia)
-  - [Dependency Injection](#dependency-injection)
-  - [Dependency Injection Frameworks](#dependency-injection-frameworks)
-  - [Plugin Pattern](#plugin-pattern)
 - [Installation](#installation)
-- [Example](#example)
 - [API](#api)
   - [Plugins](#plugins)
   - [Stacks](#stacks)
   - [Extensions](#extensions)
+- [Concepts](#concepts)
+  - [Dependency Injection](#dependency-injection)
+  - [Dependency Injection Frameworks](#dependency-injection-frameworks)
+  - [Plugin Pattern](#plugin-pattern)
+- [Example](#example)
 - [Road Map](#road-map)
   - [Features](#features)
   - [Extensions](#extensions-1)
@@ -35,6 +36,104 @@ With this pattern, you encapsulate features as "Plugins" which are then injected
   - [Plugin Incompatibility](#plugin-incompatibility)
 - [Attribution](#attribution)
 
+
+## Installation
+
+Install with npm:
+
+`npm i --save git+ssh://git@github.com:CodalReef/Halia.git`
+
+Install with Yarn:
+
+`yarn add git+ssh://git@github.com:CodalReef/Halia.git`
+
+
+## API
+
+### Plugins
+
+Define a Plugin for each feature you wish to encapsulate.  You determine what each Plugin does and what API is exported for dependencies to use.
+
+>  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation when possible.  
+
+```typescript
+export const MyPlugin: HaliaPlugin = {
+  id: "myPlugin",             //  Unique Identifier 
+  name: "My Plugin",          //  Human Readable Name
+  description: "My Plugin!",  //  Human Readable Description
+  dependencies: [],           //  Array of Plugin Identifiers
+  install: (imports) => {     //  Function to "Install" this Plugin
+    return {};                //  Return a "Plugin API" for Downstream Dependencies
+  }
+}
+```
+
+###  Stacks
+
+A "Stack" is a program built at run-time using several Halia Plugins.  Because it's built at runtime, the set of plugins in the stack can be changed and the system re-built.  
+
+```typescript
+//  Initialize the Stack
+const stack = new HaliaStack();
+
+//  Register Plugins
+stack.register(App);
+stack.register(Feature1);
+stack.register(Feature1_1);
+stack.register(Feature2);
+// etc...
+
+//  Build the Stack
+await stack.build();
+
+//  Extract an Export
+const f1Exports = stack.getExports(Feature1.id);
+
+//  Extract a Plugin
+const f1Plugin = stack.getPlugin(Feature1.id);
+```
+
+At this point, `stack` is an initialized instance of your Plugin Set.  It may be a program, or perhaps a feature to be further nested in another Halia Stack.
+
+To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
+
+### Extensions
+
+Halia is itself, a Halia Plugin, open for extension.  
+
+For example, here we install the the "Optional Dependencies" Plugin to add a new `optionalDependencies` field to each Plugin.
+
+```typescript
+//  Initialize the Stack
+const coreStack = new HaliaStack();
+
+//  Register Elements
+coreStack.register(HaliaCore);
+coreStack.register(OptionalDependencies);
+
+//  Build the Stack
+await coreStack.build();
+```
+
+Now, we can define Plugins with a new `optionalDependencies` field:
+
+```typescript
+
+const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
+  id: "myPlugin",
+  name: "My Plugin",
+  install: () => {},  //  Do Something
+  dependencies: [],
+
+  //  New Feature!
+  optionalDependencies: ["OtherPlugin"]
+}
+```
+
+>  The "Core Stack" is currently a Global which may only be built once.  The functionality added by Plugins is integrated as it's built.  We plan to address these concerns by clearing the global and turning off modifications prior to core extension. 
+
+
+##  Concepts
 
 ### Dependency Injection
 
@@ -118,7 +217,7 @@ Note that some DI Frameworks don't support chaining (modules which depend upon o
 Now, let's look at what changes when we apply the "Plugin Pattern":
 
 
-### Plugin Pattern
+### 🔌 Plugin Pattern
 In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
 
 With what we call the "Plugin Pattern", the *intention* is slightly different.  The dependencies will still be injected into each module, but instead of simply *using* these dependencies to accomplish a goal, we can also *modify* them.  Because modules in this pattern are expected to "plug" functionality into their dependencies, we call them "Plugins".
@@ -132,17 +231,6 @@ We call a Plugin "stable" if it's contract is well-defined and unbreakable.  Con
 It's possible to be explicit about which types of APIs a Plugin exports.  For example, one for *usage* and another for *modification*.  However, Halia doesn't make this distinction, and a Plugin can export an API which does any combination of these things.
 
 With this pattern, it becomes easy to mix, match, and build new features.  It's even possible to open your app for extension by external developers (like Wordpress does).
-
-
-## Installation
-
-Install with npm:
-
-`npm i --save git+ssh://git@github.com:CodalReef/Halia.git`
-
-Install with Yarn:
-
-`yarn add git+ssh://git@github.com:CodalReef/Halia.git`
 
 
 ## Example
@@ -239,90 +327,7 @@ If Paul longer wants the **🦄 Disco Duck 🦄**  we just don't register the Pl
 >  This is a simple example that can be solved in other ways.  However, it demonstrates the general idea, and as features become more complex, we've found this pattern helps to keep things organized.
 
 
-## API
-
-### Plugins
-
-Define a Plugin for each feature you wish to encapsulate.  You determine what each Plugin does and what API is exported for dependencies to use.
-
->  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation when possible.  
-
-```typescript
-export const MyPlugin: HaliaPlugin = {
-  id: "myPlugin",             //  Unique Identifier 
-  name: "My Plugin",          //  Human Readable Name
-  description: "My Plugin!",  //  Human Readable Description
-  dependencies: [],           //  Array of Plugin Identifiers
-  install: (imports) => {     //  Function to "Install" this Plugin
-    return {};                //  Return a "Plugin API" for Downstream Dependencies
-  }
-}
-```
-
-###  Stacks
-
-A "Stack" is a program built at run-time using several Halia Plugins.  Because it's built at runtime, the set of plugins in the stack can be changed and the system re-built.  
-
-```typescript
-//  Initialize the Stack
-const stack = new HaliaStack();
-
-//  Register Plugins
-stack.register(App);
-stack.register(Feature1);
-stack.register(Feature1_1);
-stack.register(Feature2);
-// etc...
-
-//  Build the Stack
-await stack.build();
-
-//  Extract an Export
-const f1Exports = stack.getExports(Feature1.id);
-
-//  Extract a Plugin
-const f1Plugin = stack.getPlugin(Feature1.id);
-```
-
-At this point, `stack` is an initialized instance of your Plugin Set.  It may be a program, or perhaps a feature to be further nested in another Halia Stack.
-
-To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
-
-### Extensions
-
-Halia is itself, a Halia Plugin, open for extension.  
-
-For example, here we install the the "Optional Dependencies" Plugin to add a new `optionalDependencies` field to each Plugin.
-
-```typescript
-//  Initialize the Stack
-const coreStack = new HaliaStack();
-
-//  Register Elements
-coreStack.register(HaliaCore);
-coreStack.register(OptionalDependencies);
-
-//  Build the Stack
-await coreStack.build();
-```
-
-Now, we can define Plugins with a new `optionalDependencies` field:
-
-```typescript
-
-const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
-  id: "myPlugin",
-  name: "My Plugin",
-  install: () => {},  //  Do Something
-  dependencies: [],
-
-  //  New Feature!
-  optionalDependencies: ["OtherPlugin"]
-}
-```
-
->  The "Core Stack" is currently a Global which may only be built once.  The functionality added by Plugins is integrated as it's built.  We plan to address these concerns by clearing the global and turning off modifications prior to core extension. 
-
+]
 ##  Road Map
 
 ### Features
