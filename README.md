@@ -392,4 +392,4 @@ This approach can be useful, but it's good practice to keep Plugins independent 
 
 ## Attribution
 
-Halia is inspired by similar DI tools (like Angular and Nest.js).  Both have helped shape our understanding of DI and DI Frameworks.
+Halia is inspired by similar DI tools like [Angular](https://angular.io/guide/providers) and [Nest](https://docs.nestjs.com/fundamentals/custom-providers).  Both resources helped shape our understanding of DI, IoC Container, and DI Frameworks.
