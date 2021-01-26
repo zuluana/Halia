@@ -5,7 +5,7 @@
 
 **Build "Plugins" to encapsulate and inject features instead of spreading them throughout the codebase.**
 
--  **Extensible**:  Use (or write) extensions to build a dependency injector tuned to your needs.
+-  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
 -  **Lightweight**:  ~ 400 lines of non-test code.
 -  **Independent**:  Not coupled with a particular back-end or front-end technology.
