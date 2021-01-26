@@ -137,7 +137,7 @@ const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
 
 ### Dependency Injection
 
-Imagine you're a goldfish (named Doug 🐠), and you love bubbles.  So much so, that you bought a Bubble Machine with a Javascript SDK!
+Imagine you're a goldfish named Doug (🐠), and you love bubbles.  So much so, that you bought a Bubble Machine with a Javascript SDK!
 
 You write a program to make bubbles when you wake up:
 
