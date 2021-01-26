@@ -16,25 +16,26 @@ Halia is a generic, extensible dependency injection (DI) framework.  However, we
 With this pattern, you encapsulate features as "Plugins" which are then injected into the app.  This keeps your code de-coupled, organized, and open for extension.  
 .
 ## Table of Contents
-- [Introduction](#halia)
-
-  * [Dependency Injection](#dependency-injection)
-
-  * [Plugin Pattern](#plugin-patternn)
-
-- [Installation](#installation)
-
-- [Example](#example)
-
-- [API](#api)
-
-- [Road Map](#roadmap)
-  * [Features](#features)
-  * [Extensions](#extensions)
-
-- [More Info](#more-info)
-
-  * [Package Managers (like npm ) vs. Halia](#package-managers-like-npm-)-vs.-halia)
+- [Halia](#halia)
+    - [TS / JS Extensible Dependency Injector](#ts--js-extensible-dependency-injector)
+  - [Table of Contents](#table-of-contents)
+    - [Dependency Injection](#dependency-injection)
+    - [Dependency Injection Frameworks](#dependency-injection-frameworks)
+    - [Plugin Pattern](#plugin-pattern)
+  - [Installation](#installation)
+  - [Example](#example)
+  - [API](#api)
+    - [Plugins](#plugins)
+    - [Stacks](#stacks)
+    - [Extensions](#extensions)
+  - [Road Map](#road-map)
+    - [Features](#features)
+    - [Extensions](#extensions-1)
+  - [More Info](#more-info)
+    - [Package Managers (like npm ) vs. Halia](#package-managers-like-npm--vs-halia)
+    - [Module Systems (like JS Modules) vs. Halia](#module-systems-like-js-modules-vs-halia)
+    - [Plugin Incompatibility](#plugin-incompatibility)
+  - [Attribution](#attribution)
 
 
 ### Dependency Injection
@@ -333,6 +334,7 @@ const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
 ### Extensions
 
 -  Incompatibility Management
+-  Plugin Versions
 -  Global Injections
 -  Cyclic Dependencies
 -  Plugin Inheritance
@@ -360,13 +362,9 @@ Halia "Plugins" are similar to "Packages", and depending on your definition, Hal
 
 JS Modules is a "Module System" used to bundle code across the filesystem and map it to variables in the local scope (using "import" and "export" statements).
 
-In contrast, Halia automatically resolves dependencies between features without the need to manually manage import order.
+In contrast, Halia automatically resolves dependencies between modules without the need to manually manage import order.  In addition, each Halia Plugin has a unique identifier which ensures it's registered as a singleton instance.
 
-In addition, each Halia Plugin has a unique identifier which ensures it's registered as a singleton instance.
-
-### Vanilla JS vs. Halia
-
-You don't need Halia to implement the "Plugin Manager" pattern.  However, as the number of dependencies grows and use-cases evolve, several problems emerge:
+You don't need Halia to manage dependencies or implement the "Plugin Pattern".  However, as the number of dependencies grows and use-cases evolve, several problems emerge:
 
 -  **Import Order**:  You need to manage import order, which can become complex and difficult to refactor.
 -  **Singleton Guarantee**:  There's no guarantee the loaded module is a Singleton.
@@ -374,52 +372,19 @@ You don't need Halia to implement the "Plugin Manager" pattern.  However, as the
 -  **Delayed Installation**:  You'll need to manually manage installation if it occurs after initial load.
 -  **Dynamic Modification**: If the set of “Features” changes at runtime, you'll need to manage that change.  For example, verifying module compatibility.
 
-With Halia, the complete dependency graph is built at build-time, so there's no need to manually order them, just declare their existence.  
+In Halia, the complete dependency graph is built at runtime, so there's no need to manually order them. Each Plugin has a unique ID associated with a singleton instance.  If the same ID is used twice, an error is thrown.  Halia Stacks can be built on-demand (and re-built) as needed.  This means, if the feature set changes at runtime, we can re-build the stack and run again.
 
-Each Plugin has a unique ID to which a singleton instance is associated.  If the same ID is used twice, an error is thrown.
+###  Plugin Incompatibility
 
->  We hope to support versioned Plugins in the future.  Possibly through a Core Plugin.
+While using Halia (or any DI Framework with the Plugin Pattern) you might encounter incompatibility between Plugins.
 
-A Plugin will not be installed unless all dependencies were installed successfully.
-
->  We hope to make this configurable, perhaps globally, per Plugin, with an injected config function, etc.
-
-Halia Stacks can be built on-demand (and re-built) as needed.  This means, if the feature set changes at runtime, we can re-build the stack and run again.
-
-### Other DI Solutions vs. Halia
-
-Halia has feature overlap with existing DI solutions, but we prioritize extensibility.
-
-For example, while many DI solutions use a class constructor for initialization, we accept a standard JS Function.  We also support custom extensions, and therefore, it's possible to build an extension for something like "Asynchronous Installation".
-
-Other DI Solutions, like Angular and Nest.js Providers can be used to solve a lot of the same problems, but with some key differences:
-
--  **Extensible**:  Use existing (or build your own) "Halia Extensions" to install the features you need.  For example, add optional dependencies, incompatibility management, etc...
--  **Independent**:  Halia is not coupled with a particular back-end or front-end technology.  But, with Halia Extensions, it can be made to work with most tech stacks.
--  **Team**:  We have a deep interest in extensibility, cross-eco integration, cross-eco context, loose coupling, system staking, virtualized centralization, and lots more.  You can expect to see more of these concepts as we release extensions, associated packages, and posts.
-
-### Principles
-
-#### Responsibility
-Each Plugin is responsible for the valid use of the imported APIs.  Without a standard mechanism to enforce or define "valid" use, the responsibility is deferred to the Plugin developers.  For this reason, it's important to understand the usage rules and limitations of each imported API and your own.  However, a Plugin is not responsible for the validity of its dependencies.
-
-###  Problems
-
-While using Halia (or any Plugin manager) you might encounter several common problems.  Most of these can be solved by applying one or more design patterns.
-
-#### Incompatibility
-An "Incompatibility" exists between two or more Plugins which cannot co-exist.  For example, when installed together, the functionality of the system may be invalid compared to the expected functional state.  To solve this problem, try the following suggestions:
+An "Incompatibility" exists between two or more Plugins which, when installed together, result in a dysfunctional state. To solve this problem, try the following suggestions:
 
 -  Remove one of the Plugins.
 -  Update one of the Plugins to fix the incompatibility.
 -  Build a new "Coupling Plugin" to fix the incompatibility.
--  Update the dependency APIs to support the Plugins.
+-  Update the dependency's exported APIs to support the Plugins.
 
-### Patterns
-
-These are common patterns you can apply to help you build robust, modular systems.
-
-####  Coupling Plugin
 A "Coupling Plugin" is used to correct invalid or missing functionality that results from an incompatibility.
 
 For example, imagine we add two new Plugins, "Video" and "Messaging".  Assuming they both inject themselves with the same API, it's possible they'd overwrite one another.  To solve this, we can build a new "Coupling Plugin", perhaps called "VideoMessaging", to inject the necessary patch.
@@ -427,6 +392,6 @@ For example, imagine we add two new Plugins, "Video" and "Messaging".  Assuming 
 This approach can be useful, but it's good practice to keep Plugins independent and compatible.  This helps control feature "fan-out" and keeps combinatorial explosion in check.
 
 
-### Attribution
+## Attribution
 
-Halia is inspired by similar DI tools (like Angular and Nest Providers).  They both have strong documentation which has helped shape my understanding of DI and DI Frameworks.
+Halia is inspired by similar DI tools (like Angular and Nest.js).  Both have helped shape our understanding of DI and DI Frameworks.
