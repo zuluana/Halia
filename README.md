@@ -90,7 +90,7 @@ const dougsBubbler = new Bubbler({ id: "dougs-bubbler" });
 const marysBubbler = new Bubbler({ id: "dougs-bubbler" });
 
 initBubbler(dougsBubbler);
-initMarysBubbler(marysBubbler);
+initBubbler(marysBubbler);
 ```
 
 With that, we only need the single `initBubbler` function.  Even if your friends Larry (🐙) and Barry (🐡) decide to buy Bubblers too.
