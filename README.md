@@ -21,14 +21,21 @@ It becomes easy to mix, match, and build new features.  It's even possible to op
 
 For more information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#more-info).
 
-## Table of Contents**
+## Table of Contents
 [Introduction](#halia)
+
 [Dependency Injection](#dependency-injection)
+
 [Plugin Pattern](#plugin-patternn)
+
 [Installation](#installation)
+
 [Example](#example)
+
 [API](#api)
+
 [More Info](#more-info)
+
 
 #### Dependency Injection
 
