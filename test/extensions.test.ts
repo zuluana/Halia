@@ -17,8 +17,8 @@ describe("Extensions", () => {
     //  Initialize the Stack
     const stack = new HaliaStack<HaliaPlugin & OptionalDependenciesPatch>();
 
-    stack.register({ name: "P1", install: () => "P1", id: "p1" })
-    stack.register({ name: "P2", install: ({ p1 }) => expect(p1).toEqual(undefined), id: "p2", optionalDependencies: ["p1"] })
+    stack.register({ name: "P1", install: () => "P1", id: "p1" });
+    stack.register({ name: "P2", install: ({ p1 }) => expect(p1).toEqual(undefined), id: "p2", optionalDependencies: ["p1"] });
 
     //  Build the Stack
     await stack.build();
@@ -45,8 +45,8 @@ describe("Extensions", () => {
     //  Initialize the Stack
     const stack = new HaliaStack<HaliaPlugin & OptionalDependenciesPatch>();
 
-    stack.register({ name: "P1", install: () => "P1", id: "p1" })
-    stack.register({ name: "P2", install: ({ p1 }) => expect(p1).toEqual("P1"), id: "p2", optionalDependencies: ["p1"] })
+    stack.register({ name: "P1", install: () => "P1", id: "p1" });
+    stack.register({ name: "P2", install: ({ p1 }) => expect(p1).toEqual("P1"), id: "p2", optionalDependencies: ["p1"] });
 
     //  Build the Stack
     await stack.build();

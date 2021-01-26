@@ -85,6 +85,6 @@ export const OptionalDependencies: HaliaPlugin<undefined, void> = {
       optionalDependencies.forEach(depId => {
         importMap[depId] = exportMap[depId];
       });
-    })
+    });
   }
 };

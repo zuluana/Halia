@@ -196,9 +196,9 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
         await this.processNode(child, exportMap);
 
         //  Invoke the Process Register
-        this.haliaCoreAPI.processRegister.invoke({ stack: this, child, parent: node })
+        this.haliaCoreAPI.processRegister.invoke({ stack: this, child, parent: node });
       }
-    };
+    }
 
 
     //  Function to obtain imports
@@ -213,7 +213,7 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
       });
 
       //  Iterate Import Transformers
-      this.haliaCoreAPI.importRegister.invoke({ stack: this, node, importMap, exportMap })
+      this.haliaCoreAPI.importRegister.invoke({ stack: this, node, importMap, exportMap });
 
       return importMap;
     };
@@ -229,7 +229,7 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
       exportMap[id] = value;
 
       //  Iterate Export Transformers
-      this.haliaCoreAPI.exportRegister.invoke({ stack: this, node, exportMap })
+      this.haliaCoreAPI.exportRegister.invoke({ stack: this, node, exportMap });
     };
 
   /**
