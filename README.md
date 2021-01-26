@@ -3,7 +3,7 @@
 # Halia
 ### TS / JS Extensible Dependency Injector
 
-**Build "Plugins" to encapsulate features instead of spreading them around your codebase.**
+**Use "Plugins" to encapsulate features instead of spreading them around your codebase.**
 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
