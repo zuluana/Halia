@@ -97,7 +97,7 @@ With that, we only need the single `initBubbler` function.  Even if your friends
 
 Now, the `initBubbler` function is no longer responsible for constructing a `bubbler` instance.  Instead, it's **injected** into the function from the outer scope.  This pattern is called "Dependency Injection" (DI).
 
-Further, because the caller is now in control of initializing the Bubbler (instead of the `initBubbler` function), we say control has been "inverted".  Dependency Injection is a means by which to achieve "Inversion of Control" (IoC).
+Further, because the caller is now in control of initializing the Bubbler (instead of the `initBubbler` function), we say control has been "inverted".  DI is one way to achieve this "Inversion of Control" (IoC).
 
 The outer scope, responsible for instantiating the `bubbler` dependency, is called the "Inversion of Control Container" (IoC Container).
 
