@@ -97,7 +97,6 @@ describe("Halia", () => {
     await haliaStack.build();
     const progAPI: HaliaProgramAPI = haliaStack.getExports(HaliaProgram.id);
     const res = await progAPI.run();
-    console.log(res);
     expect(JSON.stringify(res[0])).toEqual(JSON.stringify(["PIII:PII:PI"]));
   });
 });
