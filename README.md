@@ -13,31 +13,26 @@
 
 Halia is a generic, extensible dependency injection (DI) framework.  However, we believe it's particularly well suited for implementing the [Plugin Pattern](#plugin-pattern).
 
-With this pattern, you encapsulate each features in a "Plugin", which is then injected into your app.  Further, your Plugin may export its own "Plugin API", or "API-API" which downstream consumers can then use to change and augment its API.
+With this pattern, you encapsulate features as "Plugins" which are then injected into the app.  This keeps your code de-coupled, organized, and open for to extension.  
 
-The "Plugin Pattern" can help keep your code organized and extensible.  When you need to add a feature, there's no reason to understand the whole codebase.  Identify the application-level dependencies, learn their APIs and build a Plugin.  
-
-It becomes easy to mix, match, and build new features.  It's even possible to open your app for injection by external developers (like Wordpress does).  That said, everything has a cost, and at least for now, it does complicate static typing.
-
-For more information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#more-info).
-
+For information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#more-info).
 ## Table of Contents
-[Introduction](#halia)
+1. [Introduction](#halia)
 
-[Dependency Injection](#dependency-injection)
+ - [Dependency Injection](#dependency-injection)
 
-[Plugin Pattern](#plugin-patternn)
+-  [Plugin Pattern](#plugin-patternn)
 
-[Installation](#installation)
+2. [Installation](#installation)
 
-[Example](#example)
+3. [Example](#example)
 
-[API](#api)
+4. [API](#api)
 
-[More Info](#more-info)
+5. [More Info](#more-info)
 
 
-#### Dependency Injection
+### Dependency Injection
 
 Imagine you're a goldfish (named Doug 🐠), and you love bubbles.  So much so, that you bought a Bubble Machine with a Javascript SDK!
 
@@ -106,22 +101,34 @@ In Halia (and other frameworks like Angular and Nest.js), the developer declares
 
 This means, the developer is no longer responsible for ensuring there's only one copy of each dependency (Singleton Pattern) or timing the instantiation.  It all happens automatically, in a declarative, predictable way.
 
-#### Plugin Pattern
-DI Frameworks automatically initialize dependencies and inject them into their consumers.  The state of each dependency is often determined on construction.
+### Dependency Injection Frameworks
+You can use a DI Framework to define a "Module", its dependencies, and the code to invoke when the dependencies become available.  
 
-With what we call the "Plugin Pattern", the intention is slightly different.  Each dependency is still initialized and injected, but their state *and* API is open to modification by consumers.
+For each "Module", it generally works like this:
 
-In Halia, once a Plugin's dependencies are installed, its "install" function is invoked with the "Plugin APIs" exported by its dependencies.
+1.  **Declare**:  The module declares a list of dependencies along with a constructor function.
+2.  **Invoke**:  Once all dependencies are initialized, the framework calls the constructor with the dependencies.
 
-You can then use these dependency APIs to predictably augment existing functionality. Then, export your own "Plugin API" for down-stream consumers.
+Note that some DI Frameworks don't support chaining (modules which depend upon other modules) or nesting (modules defined within other modules).  Halia supports both of these use-cases out of the box.
 
-As new Plugins inject changes, they might change a parent API.  However, if a change breaks the API contract we call this an "unstable" modification. To stay stable, it's a Plugin's responsibility to ensure its dependencies aren't breaking its API contract.
+Now, let's look at what changes when we apply the "Plugin Pattern":
 
-On that note, it doesn't mean the API shouldn't change at all.  It's up to the Plugin to define its API contract and for dependencies to understand that contract.  That contract can include a level of acceptable change, and that's up to the Plugin developer.
 
-The "Plugin Pattern" can help keep keep your code organized and extensible.  When you need to add a feature, there's no reason to understand the whole codebase.  Identify the application-level dependencies, learn their APIs and build a Plugin.  
+### Plugin Pattern
+In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
 
-It becomes easy to mix, match, and build new features.  It's even possible to open your app for injection by external developers (like Wordpress).  That said, everything has a cost, and at least for now, it does complicate static typing.
+With what we call the "Plugin Pattern", the *intention* is slightly different.  The dependencies will still be injected into each module, but instead of simply *using* these dependencies to accomplish a goal, they can be *modified*.  Because modules in this pattern are expected to "plug" functionality into their dependencies, we call them "Plugins".
+
+It's possible to be explicit about this by exporting multiple APIs.  For example, one for *usage* and another for *modification*.  However, Halia doesn't make this distinction, and a Plugin can export an API which does any combination of these things.
+
+Each dependency is still responsible for defining the initial API passed to its consumers.  With the Plugin Pattern, its not unexpected for the API methods to change the dependency's *state*, and / or the *exported API itself*.
+
+> With the introduction of API Modification, we make a distinction between the "API Contract" and "API".  The "API Contract" is a set of rules / conditions set by a Plugin, and it should remain unchanged.  The "API", which includes the exported member functions and their associated functionality, is expected to change (within the confines of the API Contract).
+
+We call a Plugin "stable" if it's contract is well-defined and unbreakable.  Conversely, if usage of a API can lead to a breach of contract (or the contract is ambiguous), we call the Plugin "unstable".  As long as a Plugin is stable, we can still predictably use and extend its API.
+
+With this pattern, it becomes easy to mix, match, and build new features.  It's even possible to open your app for extension by external developers (like Wordpress does).
+
 
 ## Installation
 
@@ -328,7 +335,8 @@ const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
 -  API Transformers
 -  Additional Passes / Channels
 -  External Integration
--  Multiple exports for different "Targets".
+-  Multiple Exports:  It should be possible to export multiple APIs, for example, one for *usage* and another for *modification* and route these to modules tagged for that purpose.
+-  Generic Tagging
 
 
 ## More Info
