@@ -13,7 +13,7 @@
 
 Halia is a generic, extensible dependency injection (DI) framework.  However, we believe it's particularly well suited for implementing the [Plugin Pattern](#plugin-pattern).
 
-With this pattern, you encapsulate features as "Plugins" which are then injected into the app.  This keeps your code de-coupled, organized, and open for to extension.  
+With this pattern, you encapsulate features as "Plugins" which are then injected into the app.  This keeps your code de-coupled, organized, and open for extension.  
 
 For information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#more-info).
 ## Table of Contents
