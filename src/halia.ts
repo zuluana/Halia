@@ -18,6 +18,8 @@ interface PluginMap {
   [id: string]: HaliaPlugin;
 }
 
+//  TODO:  Remove "any" types where possible.
+
 //  CONSIDER:  We could build the "Core" by adding all code to the Registers.  Or, perhaps registering as declarative "Rules".  Each Rule can have a unique ID and be declaratively manipulated.
 
 export type ImportRegisterParams<T extends HaliaPlugin> = { stack: HaliaStack<T>, node: Node<T>, importMap: { [id: string]: any }, exportMap: { [id: string]: any } };
@@ -43,8 +45,7 @@ export const haliaCoreAPI = new HaliaCoreAPI();
 //  CONSIDER:  Do we need to extend "HaliaPlugin"?  Could downstream features over-write these elements?  Let's leave it for now.
 export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
 
-
-  //  Usage API
+  private haliaCoreAPI = haliaCoreAPI;
   private plugins: PluginMap = {};
   private exports: { [pluginId: string]: any } = undefined;
 
@@ -112,19 +113,9 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
      this.plugins[plugin.id] = plugin;
   };
 
-  /**
-   * Builds the Halia Stack and returns the root nodes.
-   */
-  public build = async () => {
 
-    const plugins = Object.keys(this.plugins).map(
-      (pluginName) => this.plugins[pluginName]
-    );
 
-    //  Build the Nodes
-    const nodeCache: { [pluginId: string]: Node<T> } = {};
-
-    const buildNode = (plugin: T): Node<T> => {
+  private buildNode = (plugin: T, nodeCache: { [pluginId: string]: Node<T> }): Node<T> => {
 
       //  Check Existing
       const existing = nodeCache[plugin.id];
@@ -149,7 +140,7 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
         if (cachedNode) {
           return cachedNode;
         }
-        const parentNode = buildNode(parentPlugin as any);
+        const parentNode = this.buildNode(parentPlugin as any, nodeCache);
         parentNode.children.push(node);
         return parentNode;
       });
@@ -160,55 +151,15 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
       //  Attach the Node
       nodeCache[node.id] = node;
       return node;
-    };
+  }
 
-    //  Get Node Plugins
-    const nodes = plugins.map((plugin) => buildNode(plugin as any));
-
-    //  Nest Nodes
-    const rootNodes = await this.nestNodes(nodes);
-
-    //  Build the App Depth-First
-    const exportMap: { [name: string]: any } = {};
-
-    //  Function to obtain imports
-    const getExports = (node: Node<T>) => {
-
-      const { original: { dependencies = [] } } = node;
-
-      //  Core Requirements
-      const importMap: { [name: string]: any } = {};
-      dependencies.forEach((depId) => {
-        importMap[depId] = exportMap[depId];
-      });
-
-      //  Iterate Import Transformers
-      haliaCoreAPI.importRegister.invoke({ stack: this, node, importMap, exportMap })
-
-      return importMap;
-    };
-
-    const setExports = (node: Node<T>, value: any) => {
-
-      const { original: { id } } = node;
-
-      if (exportMap[id] != undefined) {
-        throw `An export has already been defined for the '${ id }' Plugin.`;
-      }
-
-      exportMap[id] = value;
-
-      //  Iterate Export Transformers
-      haliaCoreAPI.exportRegister.invoke({ stack: this, node, exportMap })
-    };
-
-    const processNode = async (node: Node<T>) => {
+  private async processNode (node: Node<T>, exportMap: { [id: string]: any }) {
 
       //  Unpack
       const { original: plugin, children } = node;
 
       //  Gather Exports (to be used as imports)
-      const imports = getExports(node);
+      const imports = this.getNodeExports(node, exportMap);
 
       //  Install
       let exports: any;
@@ -222,7 +173,7 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
       node.isInstalled = true;
 
       //  Set Exports
-      setExports(node, exports);
+      this.setNodeExports(node, exports, exportMap);
       node.exports = exports;
 
       //  Process Children
@@ -242,16 +193,69 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
         }
 
         //  Process the Child
-        await processNode(child);
+        await this.processNode(child, exportMap);
 
         //  Invoke the Process Register
-        haliaCoreAPI.processRegister.invoke({ stack: this, child, parent: node })
+        this.haliaCoreAPI.processRegister.invoke({ stack: this, child, parent: node })
       }
     };
 
+
+    //  Function to obtain imports
+    private getNodeExports = (node: Node<T>, exportMap: { [id: string]: any }) => {
+
+      const { original: { dependencies = [] } } = node;
+
+      //  Core Requirements
+      const importMap: { [name: string]: any } = {};
+      dependencies.forEach((depId) => {
+        importMap[depId] = exportMap[depId];
+      });
+
+      //  Iterate Import Transformers
+      this.haliaCoreAPI.importRegister.invoke({ stack: this, node, importMap, exportMap })
+
+      return importMap;
+    };
+
+    private setNodeExports = (node: Node<T>, value: any, exportMap: { [id: string]: any }) => {
+
+      const { original: { id } } = node;
+
+      if (exportMap[id] != undefined) {
+        throw `An export has already been defined for the '${ id }' Plugin.`;
+      }
+
+      exportMap[id] = value;
+
+      //  Iterate Export Transformers
+      this.haliaCoreAPI.exportRegister.invoke({ stack: this, node, exportMap })
+    };
+
+  /**
+   * Builds the Halia Stack and returns the root nodes.
+   */
+  public build = async () => {
+
+    const plugins = Object.keys(this.plugins).map(
+      (pluginName) => this.plugins[pluginName]
+    );
+
+    //  Build the Nodes
+    const nodeCache: { [pluginId: string]: Node<T> } = {};
+
+    //  Get Node Plugins
+    const nodes = plugins.map((plugin) => this.buildNode(plugin as any, nodeCache));
+
+    //  Nest Nodes
+    const rootNodes = await this.nestNodes(nodes);
+
+    //  Build the App Depth-First
+    const exportMap: { [name: string]: any } = {};
+
     //  Process Root Nodes
     for (const node of rootNodes) {
-      await processNode(node);
+      await this.processNode(node, exportMap);
     }
 
     //  Set the Map
