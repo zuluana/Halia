@@ -217,7 +217,7 @@ Note that some DI Frameworks don't support chaining (modules which depend upon o
 Now, let's look at what changes when we apply the "Plugin Pattern":
 
 
-### 🔌 Plugin Pattern
+### Plugin Pattern
 In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
 
 With what we call the "Plugin Pattern", the *intention* is slightly different.  The dependencies will still be injected into each module, but instead of simply *using* these dependencies to accomplish a goal, we can also *modify* them.  Because modules in this pattern are expected to "plug" functionality into their dependencies, we call them "Plugins".
