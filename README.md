@@ -14,22 +14,27 @@
 Halia is a generic, extensible dependency injection (DI) framework.  However, we believe it's particularly well suited for implementing the [Plugin Pattern](#plugin-pattern).
 
 With this pattern, you encapsulate features as "Plugins" which are then injected into the app.  This keeps your code de-coupled, organized, and open for extension.  
-
-For information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#more-info).
+.
 ## Table of Contents
-1. [Introduction](#halia)
+- [Introduction](#halia)
 
- - [Dependency Injection](#dependency-injection)
+  * [Dependency Injection](#dependency-injection)
 
--  [Plugin Pattern](#plugin-patternn)
+  * [Plugin Pattern](#plugin-patternn)
 
-2. [Installation](#installation)
+- [Installation](#installation)
 
-3. [Example](#example)
+- [Example](#example)
 
-4. [API](#api)
+- [API](#api)
 
-5. [More Info](#more-info)
+- [Road Map](#roadmap)
+  * [Features](#features)
+  * [Extensions](#extensions)
+
+- [More Info](#more-info)
+
+  * [Package Managers (like npm ) vs. Halia](#package-managers-like-npm-)-vs.-halia)
 
 
 ### Dependency Injection
@@ -319,7 +324,7 @@ const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
 
 >  The "Core Stack" is currently a Global which may only be built once.  The functionality added by Plugins is integrated as it's built.  We plan to address these concerns by clearing the global and turning off modifications prior to core extension. 
 
-##  Roadmap
+##  Road Map
 
 ### Features
 -  Plugin Configuration
