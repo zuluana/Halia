@@ -1,24 +1,34 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### TS / JS Extensible DI Framework
+### TS / JS Extensible Dependency Injection
 
-**Build "Plugins" to encapsulate and inject features instead of spreading them around your codebase.**
+**Build "Plugins" to encapsulate and inject features instead of spreading them throughout the codebase.**
 
--  **Extensible**:  Use "Halia Extensions" to add additional features as needed.
--  **Tested**:  Test / Src Ratio (TSR): 1/2
--  **Lightweight**:  This Core Package is ~ 300 lines of code.
--  **Independent**:  Halia is not coupled with a particular back-end or front-end technology.
--  **Philosophy**:  Extensibility is a first-class concern as discussed in [Plugin Pattern] (#plugin-pattern)
+-  **Extensible**:  Use (or write) extensions to build a dependency injector tuned to your needs.
+-  **Tested**:  Test / Src Ratio (TSR): ~1/2.
+-  **Lightweight**:  ~ 400 lines of non-test code.
+-  **Independent**:  Not coupled with a particular back-end or front-end technology.
+-  **Philosophy**:  Extensibility is a first-class concern as discussed in [Plugin Pattern](#plugin-pattern).
 
-Halia is intended to be a generic, extensible DI tool.  However, we see a lot of value in the [Plugin Pattern](#plugin-pattern).  Therefore, extensibility is a first-class concern of this repo, extensions, and our team.
+Halia is a generic, extensible dependency injection (DI) framework.  However, we believe it's particularly well suited for implementing the [Plugin Pattern](#plugin-pattern).
 
-That said, you *can* use Halia as a standard, extensible DI solution without using the Plugin Pattern.
+With this pattern, you encapsulate each features in a "Plugin", which is then injected into your app.  Further, your Plugin may export its own "Plugin API", or "API-API" which downstream consumers can then use to change and augment its API.
+
+The "Plugin Pattern" can help keep your code organized and extensible.  When you need to add a feature, there's no reason to understand the whole codebase.  Identify the application-level dependencies, learn their APIs and build a Plugin.  
+
+It becomes easy to mix, match, and build new features.  It's even possible to open your app for injection by external developers (like Wordpress does).  That said, everything has a cost, and at least for now, it does complicate static typing.
 
 For more information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#more-info).
 
-**Table of Contents**
-
+## Table of Contents**
+[Introduction](#halia)
+[Dependency Injection](#dependency-injection)
+[Plugin Pattern](#plugin-patternn)
+[Installation](#installation)
+[Example](#example)
+[API](#api)
+[More Info](#more-info)
 
 #### Dependency Injection
 
@@ -92,7 +102,7 @@ This means, the developer is no longer responsible for ensuring there's only one
 #### Plugin Pattern
 DI Frameworks automatically initialize dependencies and inject them into their consumers.  The state of each dependency is often determined on construction.
 
-With the "Plugin Pattern", the intention is slightly different.  Each dependency is still initialized and injected, but their state *and* API is open to modification by consumers.
+With what we call the "Plugin Pattern", the intention is slightly different.  Each dependency is still initialized and injected, but their state *and* API is open to modification by consumers.
 
 In Halia, once a Plugin's dependencies are installed, its "install" function is invoked with the "Plugin APIs" exported by its dependencies.
 
@@ -211,7 +221,7 @@ If Paul longer wants the **🦄 Disco Duck 🦄**  we just don't register the Pl
 >  This is a simple example that can be solved in other ways.  However, it demonstrates the general idea, and as features become more complex, we've found this pattern helps to keep things organized.
 
 
-## Usage
+## API
 
 ### Plugins
 
@@ -297,7 +307,7 @@ const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
 
 ##  Roadmap
 
-### Core Features
+### Features
 -  Plugin Configuration
 -  Consider exporting an Object OR specifically *a Plugin* from each Halia "Stack".
 
