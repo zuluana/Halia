@@ -2,25 +2,20 @@
  * Copyright (C) Oranda - All Rights Reserved (January 2019 - January 2021)
  */
 
- export interface HaliaPlugin<I = any, E = any> {
+import { HaliaCoreAPI, haliaCoreAPI, ImportRegisterParams } from "./halia";
+
+ export interface HaliaPlugin<Imports = any, Exports = any> {
   id: string;
   name: string;
   description?: string;
   dependencies?: string[];
-  install: (imports: I) => E;
+  install: (imports: Imports) => Exports;
  }
 
 
 /**
  * HaliaCore
  */
-
-export class HaliaCoreAPI {
-  //  TODO:  This is where we can build the API used to extend Halia itself.
-  //         For example, optional dependencies, incompatibility management, multiple passes / channels (not just install), module inheritance / overloads, piping / transform system, cyclic dependencies, etc...
-}
-
-const haliaCoreAPI = new HaliaCoreAPI();
 
 export const HaliaCore: HaliaPlugin<undefined, HaliaCoreAPI> = {
   id: "haliaCore",
@@ -61,12 +56,35 @@ export class HaliaProgramAPI {
 }
 
 
-export const HaliaProgram: HaliaPlugin<undefined, HaliaCoreAPI> = {
+export const HaliaProgram: HaliaPlugin<undefined, HaliaProgramAPI> = {
   id: "haliaProgram",
   name: "Halia Program",
   description: "Extensible Program",
   dependencies: [],
   install: () => {
     return new HaliaProgramAPI();
+  }
+};
+
+
+export interface OptionalDependenciesPatch {
+  optionalDependencies?: string[];
+}
+
+/**
+ * NOTE:  Optional Dependencies may be useful while debugging
+ */
+export const OptionalDependencies: HaliaPlugin<undefined, void> = {
+  id: "optionalDependencies",
+  name: "Optional Dependencies",
+  description: "Optional Dependencies",
+  dependencies: [HaliaCore.id],
+  install: ({ haliaCore }: { haliaCore: HaliaCoreAPI }) => {
+    haliaCore.importRegister.addRegister("optional-dependencies", ({ stack, node, importMap, exportMap }: ImportRegisterParams<HaliaPlugin & OptionalDependenciesPatch>) => {
+      const { original: { optionalDependencies = [] } } = node;
+      optionalDependencies.forEach(depId => {
+        importMap[depId] = exportMap[depId];
+      });
+    })
   }
 };

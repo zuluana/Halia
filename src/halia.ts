@@ -2,6 +2,7 @@
  * Copyright (C) Oranda - All Rights Reserved (January 2019 - January 2021)
  */
 
+import { Register } from "./register";
 import { HaliaPlugin } from "./core-plugin";
 
 export interface Node<T> {
@@ -17,10 +18,35 @@ interface PluginMap {
   [id: string]: HaliaPlugin;
 }
 
-export class HaliaStack {
+//  CONSIDER:  We could build the "Core" by adding all code to the Registers.  Or, perhaps registering as declarative "Rules".  Each Rule can have a unique ID and be declaratively manipulated.
 
-  public plugins: PluginMap = {};
-  public exports: { [pluginId: string]: any } = undefined;
+export type ImportRegisterParams<T extends HaliaPlugin> = { stack: HaliaStack<T>, node: Node<T>, importMap: { [id: string]: any }, exportMap: { [id: string]: any } };
+export type ExportRegisterParams<T extends HaliaPlugin> = { stack: HaliaStack<T>, node: Node<T>, exportMap: { [id: string]: any } };
+export type ProcessRegisterParams<T extends HaliaPlugin> = { stack: HaliaStack<T>, child: Node<T>, parent: Node<T> };
+
+/**
+ * Extension API
+ * Defines the HaliaCore "Plugin API" (I also call this an "API-API")
+ */
+
+ export class HaliaCoreAPI {
+
+  public importRegister: Register<ImportRegisterParams<any>> = new Register<ImportRegisterParams<any>>();
+  public exportRegister: Register<ExportRegisterParams<any>> = new Register<ExportRegisterParams<any>>();
+  public processRegister: Register<ProcessRegisterParams<any>> = new Register<ProcessRegisterParams<any>>();
+ }
+
+ //  CONSIDER:  This could be made per-stack instead of global.
+export const haliaCoreAPI = new HaliaCoreAPI();
+
+
+//  CONSIDER:  Do we need to extend "HaliaPlugin"?  Could downstream features over-write these elements?  Let's leave it for now.
+export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
+
+
+  //  Usage API
+  private plugins: PluginMap = {};
+  private exports: { [pluginId: string]: any } = undefined;
 
   public getPlugin = (pluginId: string) => {
     return this.plugins[pluginId];
@@ -76,7 +102,7 @@ export class HaliaStack {
     return rootNodes;
   };
 
-  public register = (plugin: HaliaPlugin) => {
+  public register = (plugin: T) => {
 
     //  TODO:  Build a more robust, contextual error handling system (like Typescript).
 
@@ -96,9 +122,9 @@ export class HaliaStack {
     );
 
     //  Build the Nodes
-    const nodeCache: { [pluginId: string]: Node<HaliaPlugin> } = {};
+    const nodeCache: { [pluginId: string]: Node<T> } = {};
 
-    const buildNode = (plugin: HaliaPlugin): Node<HaliaPlugin> => {
+    const buildNode = (plugin: T): Node<T> => {
 
       //  Check Existing
       const existing = nodeCache[plugin.id];
@@ -107,7 +133,7 @@ export class HaliaStack {
       }
 
       //  Define the Node
-      const node: Node<HaliaPlugin> = {
+      const node: Node<T> = {
         original: plugin,
         id: plugin.id,
         parents: [],
@@ -123,7 +149,7 @@ export class HaliaStack {
         if (cachedNode) {
           return cachedNode;
         }
-        const parentNode = buildNode(parentPlugin);
+        const parentNode = buildNode(parentPlugin as any);
         parentNode.children.push(node);
         return parentNode;
       });
@@ -137,7 +163,7 @@ export class HaliaStack {
     };
 
     //  Get Node Plugins
-    const nodes = plugins.map((plugin) => buildNode(plugin));
+    const nodes = plugins.map((plugin) => buildNode(plugin as any));
 
     //  Nest Nodes
     const rootNodes = await this.nestNodes(nodes);
@@ -146,35 +172,43 @@ export class HaliaStack {
     const exportMap: { [name: string]: any } = {};
 
     //  Function to obtain imports
-    const getExports = (dependencies: string[] = []) => {
+    const getExports = (node: Node<T>) => {
 
+      const { original: { dependencies = [] } } = node;
 
-      //  CONSIDER:  Add a registration point / hook point / event trigger for HaliaCore.
-
+      //  Core Requirements
       const importMap: { [name: string]: any } = {};
-      dependencies.forEach((dependencyId) => {
-        importMap[dependencyId] = exportMap[dependencyId];
+      dependencies.forEach((depId) => {
+        importMap[depId] = exportMap[depId];
       });
+
+      //  Iterate Import Transformers
+      haliaCoreAPI.importRegister.invoke({ stack: this, node, importMap, exportMap })
+
       return importMap;
     };
 
-    const setExports = (pluginId: string, value: any) => {
+    const setExports = (node: Node<T>, value: any) => {
 
-      //  CONSIDER:  Add a registration point / hook point / event trigger for HaliaCore.
+      const { original: { id } } = node;
 
-      if (exportMap[pluginId] != undefined) {
-        throw `An export has already been defined for the '${ pluginId }' Plugin.`;
+      if (exportMap[id] != undefined) {
+        throw `An export has already been defined for the '${ id }' Plugin.`;
       }
-      exportMap[pluginId] = value;
+
+      exportMap[id] = value;
+
+      //  Iterate Export Transformers
+      haliaCoreAPI.exportRegister.invoke({ stack: this, node, exportMap })
     };
 
-    const processNode = async (node: Node<HaliaPlugin>) => {
+    const processNode = async (node: Node<T>) => {
 
       //  Unpack
       const { original: plugin, children } = node;
 
       //  Gather Exports (to be used as imports)
-      const imports = getExports(plugin.dependencies);
+      const imports = getExports(node);
 
       //  Install
       let exports: any;
@@ -188,13 +222,11 @@ export class HaliaStack {
       node.isInstalled = true;
 
       //  Set Exports
-      setExports(plugin.id, exports);
+      setExports(node, exports);
       node.exports = exports;
 
       //  Process Children
       for (const child of children) {
-
-        //  CONSIDER:  Add a registration point / hook point / event trigger for HaliaCore.
 
         //  Check Installed
         if (child.isInstalled) {
@@ -211,6 +243,9 @@ export class HaliaStack {
 
         //  Process the Child
         await processNode(child);
+
+        //  Invoke the Process Register
+        haliaCoreAPI.processRegister.invoke({ stack: this, child, parent: node })
       }
     };
 

@@ -1,23 +1,110 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### TS / JS Dependency Injector
+### TS / JS Extensible DI Framework
 
 **Build "Plugins" to encapsulate and inject features instead of spreading them around your codebase.**
 
-Halia is an extensible, lightweight dependency injection (DI) tool used to build extensible, modular systems.  Write "Plugins" to centralize features and inject them into your App (or other Plugins).
+-  **Extensible**:  Use "Halia Extensions" to add additional features as needed.
+-  **Tested**:  Test / Src Ratio (TSR): 1/2
+-  **Lightweight**:  This Core Package is ~ 300 lines of code.
+-  **Independent**:  Halia is not coupled with a particular back-end or front-end technology.
+-  **Philosophy**:  Extensibility is a first-class concern as discussed in [Plugin Pattern] (#plugin-pattern)
 
-To differentiate from existing DI solutions, Halia prioritizes "extensibility".  Each Plugin has an "install" phase where it initializes itself **and** injects functionality back into its dependencies.  It then exports its own API for downstream Plugins to inject back into it.
+Halia is intended to be a generic, extensible DI tool.  However, we see a lot of value in the [Plugin Pattern](#plugin-pattern).  Therefore, extensibility is a first-class concern of this repo, extensions, and our team.
 
-For more information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#More Info).
+That said, you *can* use Halia as a standard, extensible DI solution without using the Plugin Pattern.
 
-#### Plugin Overview
+For more information regarding how Halia compares to existing Package Managers, Module Systems, and DI Solutions, please see [More Info](#more-info).
 
-Each Plugin may depend upon other Plugins.  Once a Plugin's dependencies are installed, its "install" function is invoked with the "Plugin APIs" exported by its dependencies.
+**Table of Contents**
 
-Use these dependency APIs to predictably augment existing functionality. Then, export your own "Plugin API" for down-stream consumers.
 
-The set of installed Plugins can be changed at runtime and the app re-built. Halia is itself, a Halia Plugin, so it's open for extension.
+#### Dependency Injection
+
+Imagine you're a goldfish (named Doug 🐠), and you love bubbles.  So much so, that you bought a Bubble Machine with a Javascript SDK!
+
+You write a program to make bubbles when you wake up:
+
+```typescript
+import * as Bubbler from 'Bubbler';
+const initBubbler = () => {
+
+  //  Instantiate
+  const bubbler = new Bubbler({ id: "dougs-bubbler" });
+
+  //  Start the Bubbler
+  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
+}
+initBubbler();
+```
+
+Great, now you awaken to fresh, well-oxygenated water 💦
+
+You tell your friend Mary (🐟), and she's so excited, she buys a bubbler too.
+
+You update the code to initialize both bubblers:
+
+
+```typescript
+import * as Bubbler from 'Bubbler';
+const initDougsBubbler = () => {
+  const bubbler = new Bubbler({ id: "dougs-bubbler" });
+  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
+}
+const initMarysBubbler = () => {
+  const bubbler = new Bubbler({ id: "marys-bubbler" });
+  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
+}
+initDougsBubbler();
+initMarysBubbler();
+```
+
+It works, but there's something fishy going on here...
+
+Instead of duplicating and renaming the function, you can "hoist" the instantiation step outside the functions:
+
+```typescript
+import * as Bubbler from 'Bubbler';
+const initBubbler = (bubbler) => { 
+  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
+}
+
+const dougsBubbler = new Bubbler({ id: "dougs-bubbler" });
+const marysBubbler = new Bubbler({ id: "dougs-bubbler" });
+
+initBubbler(dougsBubbler);
+initMarysBubbler(marysBubbler);
+```
+
+With that, we only need the single `initBubbler` function.  Even if your friends Larry (🐙) and Barry (🐡) decide to buy Bubblers too.
+
+Now, the `initBubbler` function is no longer responsible for constructing a `bubbler` instance.  Instead, it's **injected** into the function from the outer scope.  This pattern is called "Dependency Injection" (DI).
+
+Further, because the caller is now in control of initializing the Bubbler (instead of the `initBubbler` function), we say control has been "inverted".  Dependency Injection is a means by which to achieve "Inversion of Control" (IoC).
+
+The outer scope, responsible for instantiating the `bubbler` dependency, is called the "Inversion of Control Container" (IoC Container).
+
+In Halia (and other frameworks like Angular and Nest.js), the developer declares a function's dependencies, and the framework acts as the IoC Container, automatically invoking each function with the injected parameters.
+
+This means, the developer is no longer responsible for ensuring there's only one copy of each dependency (Singleton Pattern) or timing the instantiation.  It all happens automatically, in a declarative, predictable way.
+
+#### Plugin Pattern
+DI Frameworks automatically initialize dependencies and inject them into their consumers.  The state of each dependency is often determined on construction.
+
+With the "Plugin Pattern", the intention is slightly different.  Each dependency is still initialized and injected, but their state *and* API is open to modification by consumers.
+
+In Halia, once a Plugin's dependencies are installed, its "install" function is invoked with the "Plugin APIs" exported by its dependencies.
+
+You can then use these dependency APIs to predictably augment existing functionality. Then, export your own "Plugin API" for down-stream consumers.
+
+As new Plugins inject changes, they might change a parent API.  However, if a change breaks the API contract we call this an "unstable" modification. To stay stable, it's a Plugin's responsibility to ensure its dependencies aren't breaking its API contract.
+
+On that note, it doesn't mean the API shouldn't change at all.  It's up to the Plugin to define its API contract and for dependencies to understand that contract.  That contract can include a level of acceptable change, and that's up to the Plugin developer.
+
+The "Plugin Pattern" can help keep keep your code organized and extensible.  When you need to add a feature, there's no reason to understand the whole codebase.  Identify the application-level dependencies, learn their APIs and build a Plugin.  
+
+It becomes easy to mix, match, and build new features.  It's even possible to open your app for injection by external developers (like Wordpress).  That said, everything has a cost, and at least for now, it does complicate static typing.
 
 ## Installation
 
@@ -146,7 +233,7 @@ export const MyPlugin: HaliaPlugin = {
 
 ###  Stacks
 
-A "Stack" is a program built at run-time using several Halia Plugins.
+A "Stack" is a program built at run-time using several Halia Plugins.  Because it's built at runtime, the set of plugins in the stack can be changed and the system re-built.  
 
 ```typescript
 //  Initialize the Stack
@@ -173,15 +260,48 @@ At this point, `stack` is an initialized instance of your Plugin Set.  It may be
 
 To extract a Plugin or Exported API from a stack use the `getExports` and `getPlugin` Stack methods.
 
+### Extensions
+
+Halia is itself, a Halia Plugin, open for extension.  
+
+For example, here we install the the "Optional Dependencies" Plugin to add a new `optionalDependencies` field to each Plugin.
+
+```typescript
+//  Initialize the Stack
+const coreStack = new HaliaStack();
+
+//  Register Elements
+coreStack.register(HaliaCore);
+coreStack.register(OptionalDependencies);
+
+//  Build the Stack
+await coreStack.build();
+```
+
+Now, we can define Plugins with a new `optionalDependencies` field:
+
+```typescript
+
+const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
+  id: "myPlugin",
+  name: "My Plugin",
+  install: () => {},  //  Do Something
+  dependencies: [],
+
+  //  New Feature!
+  optionalDependencies: ["OtherPlugin"]
+}
+```
+
+>  The "Core Stack" is currently a Global which may only be built once.  The functionality added by Plugins is integrated as it's built.  We plan to address these concerns by clearing the global and turning off modifications prior to core extension. 
 
 ##  Roadmap
 
+### Core Features
 -  Plugin Configuration
 -  Consider exporting an Object OR specifically *a Plugin* from each Halia "Stack".
 
-## Extensions
-
-Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be used for building several augmentations onto Halia.  Some ideas include:
+### Extensions
 
 -  Incompatibility Management
 -  Global Injections
@@ -193,7 +313,8 @@ Halia will eventually be extensible via the "HaliaCore" Plugin.  This can be use
 -  External Integration
 -  Multiple exports for different "Targets".
 
-## (More-Info)
+
+## More Info
 
 ### Package Managers (like npm ) vs. Halia
 
@@ -237,14 +358,11 @@ Halia Stacks can be built on-demand (and re-built) as needed.  This means, if th
 
 ### Other DI Solutions vs. Halia
 
-Our *intent* is for Halia to be a generic, extensible Dependency Injection tool.  However, we see a lot of value in the "Plugin Pattern".  Therefore, extensibility is a first-class concern of ours, this this repo, and Halia Extensions.
+Halia has feature overlap with existing DI solutions, but we prioritize extensibility.
 
-For example, while most DI solutions use a class constructor for initialization, we accept a standard JS Function.  This makes it possible to build an extension for "Asynchronous Installation".
-
- However, you *can* use Halia as a standard DI solution without implementing the "Plugin Pattern" with back-installation. 
+For example, while many DI solutions use a class constructor for initialization, we accept a standard JS Function.  We also support custom extensions, and therefore, it's possible to build an extension for something like "Asynchronous Installation".
 
 Other DI Solutions, like Angular and Nest.js Providers can be used to solve a lot of the same problems, but with some key differences:
-
 
 -  **Extensible**:  Use existing (or build your own) "Halia Extensions" to install the features you need.  For example, add optional dependencies, incompatibility management, etc...
 -  **Independent**:  Halia is not coupled with a particular back-end or front-end technology.  But, with Halia Extensions, it can be made to work with most tech stacks.
@@ -281,4 +399,4 @@ This approach can be useful, but it's good practice to keep Plugins independent 
 
 ### Attribution
 
-Halia is inspired by similar dependency injection tools (like Angular and Nest Providers), but de-coupled from the specific back-end and front-end technology.
+Halia is inspired by similar DI tools (like Angular and Nest Providers).  They both have strong documentation which has helped shape my understanding of DI and DI Frameworks.
