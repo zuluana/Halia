@@ -19,7 +19,7 @@ With this pattern, you encapsulate features as "Plugins" which are then injected
 - [Introduction](#halia)
   - [Dependency Injection](#dependency-injection)
   - [Dependency Injection Frameworks](#dependency-injection-frameworks)
-- [Plugin Pattern](#plugin-pattern)
+  - [Plugin Pattern](#plugin-pattern)
 - [Installation](#installation)
 - [Example](#example)
 - [API](#api)
