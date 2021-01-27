@@ -2,9 +2,10 @@
 
 # Halia
 
-### Stop Spreading Features.  Build with a Tree of Plugins.
+### Extensible TS / JS Dependency Injection Framework
+>  Stop Spreading Features.  Build with a Tree of Plugins.
 
-> Extensible TS / JS Dependency Injection Framework
+
 > 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
