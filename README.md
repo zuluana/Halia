@@ -1,12 +1,11 @@
 ![Halia Logo](https://github.com/CodalReef/Halia/blob/master/assets/Halia%20Cover.png?raw=true)
 
 # Halia
-### Extensible TS / JS Dependency Injection Framework
 
-<div style="background-color: #fafafa; padding: 30px; border-radius: 20px; box-shadow: 4px 4px 7px #dddddd;">
-  <p>Instead of spreading each feature around your codebase, build your app as a tree of "Plugins".</p>
-</div>
+### Stop Spreading Features.  Build with a Tree of Plugins.
 
+> Extensible TS / JS Dependency Injection Framework
+> 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
 -  **Lightweight**:  ~ 400 lines of non-test code.
@@ -15,9 +14,7 @@
 
 Halia is a generic, extensible dependency injection (DI) framework.  However, we believe it's particularly well suited to the [Plugin Pattern](#plugin-pattern).
 
-> Instead of spreading each feature around your codebase, build your app as a tree of "Plugins".
-
-With this pattern, you encapsulate features as "Plugins" which are then injected into your app (or other plugins).  This keeps your code de-coupled, organized, and open for extension.  
+With this pattern, you build a "Plugin" to encapsulate each feature and inject it into your app (or other plugins).  This keeps your code de-coupled, organized, and open for extension.  
 
 ## 📖 Table of Contents
 - [Introduction](#halia)
