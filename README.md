@@ -145,7 +145,7 @@ Halia is a "Dependency Injection Framework".  Before using Halia, it's good to h
 
 ![Doug](https://github.com/CodalReef/Halia/blob/master/assets/Doug.png?raw=true)
 
-If you're new to these concepts, we recommend reading our DEV article:  [Learn Dependency Injection with Dough the Goldfish 🐠](https://dev.to/codalreef/learn-dependency-injection-with-doug-the-goldfish-3j43)
+If you're new to these concepts, we recommend reading our DEV article:  [Learn Dependency Injection with Doug the Goldfish 🐠](https://dev.to/codalreef/learn-dependency-injection-with-doug-the-goldfish-3j43)
 
 ### Plugin Pattern
 In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
