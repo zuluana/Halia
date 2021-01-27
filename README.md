@@ -5,8 +5,6 @@
 ### Extensible TS / JS Dependency Injection Framework
 >  Stop Spreading Features.  Build Apps as a Tree of Plugins.
 
-
-> 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
 -  **Lightweight**:  ~ 400 lines of non-test code.
@@ -148,9 +146,10 @@ Halia is a "Dependency Injection Framework".  Before using Halia, it's good to h
 If you're new to these concepts, we recommend reading our DEV article:  [Learn Dependency Injection with Doug the Goldfish 🐠](https://dev.to/codalreef/learn-dependency-injection-with-doug-the-goldfish-3j43)
 
 ### Plugin Pattern
+
 In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
 
-With what we call the "Plugin Pattern", the *intention* is slightly different.  The dependencies will still be injected into each module, but instead of simply *using* these dependencies to accomplish a goal, we can also *modify* them.  Because modules in this pattern are expected to "plug" functionality into their dependencies, we call them "Plugins".
+With the "Plugin Pattern", the *intention* is slightly different.  The dependencies will still be injected into each module, but instead of simply *using* these dependencies to accomplish a goal, we can also *modify* them.  Because modules in this pattern are expected to "plug" functionality into their dependencies, we call them "Plugins".
 
 Each dependency is still responsible for defining the initial API passed to its consumers.  With the Plugin Pattern, its not unexpected for the API methods to change the dependency's *state*, and / or the *exported API itself*.
 
