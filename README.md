@@ -3,7 +3,7 @@
 # Halia
 
 ### Extensible TS / JS Dependency Injection Framework
->  Stop Spreading Features.  Build with a Tree of Plugins.
+>  Stop Spreading Features.  Build Apps as a Tree of Plugins.
 
 
 > 
