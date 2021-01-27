@@ -13,9 +13,9 @@
 -  **Independent**:  Not coupled with a particular back-end or front-end technology.
 -  **Philosophy**:  Extensibility is a first-class concern as discussed in [Plugin Pattern](#plugin-pattern).
 
-Halia is a generic, extensible dependency injection (DI) framework.  However, we believe it's particularly well suited to the [Plugin Pattern](#plugin-pattern).
+Halia is a generic, extensible dependency injection (DI) framework.  However, we use it to generate apps at runtime using the [Plugin Pattern](#plugin-pattern).
 
-With this pattern, you build a "Plugin" to encapsulate each feature and inject it into your app (or other plugins).  This keeps your code de-coupled, organized, and open for extension.  
+Build "Plugins" to encapsulate and inject features into your app (or other plugins).  This keeps features simple, de-coupled, and open for extension.  
 
 ## 📖 Table of Contents
 - [Introduction](#halia)
