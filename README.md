@@ -3,7 +3,7 @@
 # Halia
 ### Extensible TS / JS Dependency Injection Framework
 
-**Stop spreading features around your codebase.  Build Apps as a tree of "Plugins".**
+> Stop spreading features around your codebase by building apps as a tree of "Plugins".
 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
