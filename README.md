@@ -3,7 +3,7 @@
 # Halia
 ### Extensible TS / JS Dependency Injection Framework
 
-**Use "Plugins" to encapsulate features instead of spreading them around your codebase.**
+**Stop spreading features around your codebase.  Build Apps as a tree of "Plugins".**
 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
@@ -24,7 +24,6 @@ With this pattern, you encapsulate features as "Plugins" which are then injected
   - [Extensions](#extensions)
 - [Concepts](#concepts)
   - [Dependency Injection](#dependency-injection)
-  - [Dependency Injection Frameworks](#dependency-injection-frameworks)
   - [Plugin Pattern](#plugin-pattern)
 - [Example](#example)
 - [Road Map](#road-map)
@@ -104,6 +103,7 @@ Halia is itself, a Halia Plugin, open for extension.
 For example, here we install the the "Optional Dependencies" Plugin to add a new `optionalDependencies` field to each Plugin.
 
 ```typescript
+
 //  Initialize the Stack
 const coreStack = new HaliaStack();
 
@@ -113,6 +113,7 @@ coreStack.register(OptionalDependencies);
 
 //  Build the Stack
 await coreStack.build();
+
 ```
 
 Now, we can define Plugins with a new `optionalDependencies` field:
@@ -132,90 +133,17 @@ const MyPlugin: HaliaPlugin & OptionalDependenciesPatch = {
 
 >  The "Core Stack" is currently a Global which may only be built once.  The functionality added by Plugins is integrated as it's built.  We plan to address these concerns by clearing the global and turning off modifications prior to core extension. 
 
+Note that some DI Frameworks don't support chaining (modules which depend upon other modules) or nesting (modules defined within other modules).  Halia supports both of these use-cases out of the box.
 
 ##  Concepts
 
+Halia is a "Dependency Injection Framework".  Before using Halia, it's good to have an understanding of "Dependency Injection", the "Plugin Pattern", and related concepts.  
+
 ### Dependency Injection
 
-Imagine you're a goldfish named Doug (🐠), and you love bubbles.  So much so, that you bought a Bubble Machine with a Javascript SDK!
+![Doug](https://github.com/CodalReef/Halia/blob/master/assets/Doug.png?raw=true)
 
-You write a program to make bubbles when you wake up:
-
-```typescript
-import * as Bubbler from 'Bubbler';
-const initBubbler = () => {
-
-  //  Instantiate
-  const bubbler = new Bubbler({ id: "dougs-bubbler" });
-
-  //  Start the Bubbler
-  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
-}
-initBubbler();
-```
-
-Great, now you awaken to fresh, well-oxygenated water 💦
-
-You tell your friend Mary (🐟), and she's so excited, she buys a bubbler too.
-
-You update the code to initialize both bubblers:
-
-
-```typescript
-import * as Bubbler from 'Bubbler';
-const initDougsBubbler = () => {
-  const bubbler = new Bubbler({ id: "dougs-bubbler" });
-  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
-}
-const initMarysBubbler = () => {
-  const bubbler = new Bubbler({ id: "marys-bubbler" });
-  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
-}
-initDougsBubbler();
-initMarysBubbler();
-```
-
-It works, but there's something fishy going on here...
-
-Instead of duplicating and renaming the function, you can "hoist" the instantiation step outside the functions:
-
-```typescript
-import * as Bubbler from 'Bubbler';
-const initBubbler = (bubbler) => { 
-  bubbler.bubble({ startTime: "7:00AM", endTime: "8:00AM" })
-}
-
-const dougsBubbler = new Bubbler({ id: "dougs-bubbler" });
-const marysBubbler = new Bubbler({ id: "dougs-bubbler" });
-
-initBubbler(dougsBubbler);
-initBubbler(marysBubbler);
-```
-
-With that, we only need the single `initBubbler` function.  Even if your friends Larry (🐙) and Barry (🐡) decide to buy Bubblers too.
-
-Now, the `initBubbler` function is no longer responsible for constructing a `bubbler` instance.  Instead, it's **injected** into the function from the outer scope.  This pattern is called "Dependency Injection" (DI).
-
-Further, because the caller is now in control of initializing the Bubbler (instead of the `initBubbler` function), we say control has been "inverted".  DI is one way to achieve this "Inversion of Control" (IoC).
-
-The outer scope, responsible for instantiating the `bubbler` dependency, is called the "Inversion of Control Container" (IoC Container).
-
-In Halia (and other frameworks like Angular and Nest.js), the developer declares a function's dependencies, and the framework acts as the IoC Container, automatically invoking each function with the injected parameters.
-
-This means, the developer is no longer responsible for ensuring there's only one copy of each dependency (Singleton Pattern) or timing the instantiation.  It all happens automatically, in a declarative, predictable way.
-
-### Dependency Injection Frameworks
-You can use a DI Framework to define a "Module", its dependencies, and the code to invoke when the dependencies become available.  
-
-For each "Module", it generally works like this:
-
-1.  **Declare**:  The module declares a list of dependencies along with a constructor function.
-2.  **Invoke**:  Once all dependencies are initialized, the framework calls the constructor with the dependencies.
-
-Note that some DI Frameworks don't support chaining (modules which depend upon other modules) or nesting (modules defined within other modules).  Halia supports both of these use-cases out of the box.
-
-Now, let's look at what changes when we apply the "Plugin Pattern":
-
+If you're new to these concepts, we recommend reading our DEV article:  [Learn Dependency Injection with Dough the Goldfish 🐠](https://dev.to/codalreef/learn-dependency-injection-with-doug-the-goldfish-3j43)
 
 ### Plugin Pattern
 In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
