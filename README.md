@@ -25,7 +25,7 @@ Build "Plugins" to encapsulate and inject features into your app (or other plugi
 - [Concepts](#concepts)
   - [Dependency Injection](#dependency-injection)
   - [Pluggable Systems](#plugin-based-architecture)
-  - [Building Pluggable Systems with Dependency Injection](#building-pluggable-systems-with-dependency-injection)
+  - [Pluggable Systems with DI](#pluggable-systems-with-di)
 - [Example](#example)
 - [Road Map](#road-map)
   - [Features](#features)
@@ -144,15 +144,15 @@ Halia is a "Dependency Injection Framework".  Before using Halia, it's good to h
 
 ![Doug](https://github.com/CodalReef/Halia/blob/master/assets/Doug.png?raw=true)
 
-If you're new to Dependency Injection, we recommend reading our DEV article:  [Learn Dependency Injection with Doug the Goldfish 🐠](https://dev.to/codalreef/learn-dependency-injection-with-doug-the-goldfish-3j43)
+If you're new to Dependency Injection, we recommend reading our article:  [Learn Dependency Injection with Doug the Goldfish 🐠](https://dev.to/codalreef/learn-dependency-injection-with-doug-the-goldfish-3j43)
 
 ### Pluggable Systems
 
-![Lenny](https://github.com/CodalReef/Halia/blob/master/assets/Lenny.png?raw=true)
+![Lenny](https://github.com/CodalReef/Halia/blob/master/assets/Lenny.jpg?raw=true)
 
-If you're new to building "Pluggable" systems, we recommend reading our DEV article:  [Build Pluggable Apps with Lenny the Duck 🦆](https://dev.to/codalreef/build-pluggable-apps-with-stan-the-duck-14d4)
+If you're new to building "Pluggable" systems, we recommend reading our article:  [Build Pluggable Apps with Lenny the Duck 🦆](https://dev.to/codalreef/build-pluggable-apps-with-stan-the-duck-14d4)
 
-### Building Pluggable Systems with Dependency Injection
+### Pluggable Systems with DI
 
 In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
 
