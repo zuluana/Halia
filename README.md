@@ -150,7 +150,7 @@ If you're new to Dependency Injection, we recommend reading our article:  [Learn
 
 ![Lenny](https://github.com/CodalReef/Halia/blob/master/assets/Lenny.jpg?raw=true)
 
-If you're new to building "Pluggable" systems, we recommend reading our article:  [Build Pluggable Apps with Lenny the Duck 🦆](https://dev.to/codalreef/build-pluggable-apps-with-stan-the-duck-14d4)
+If you're new to building "Pluggable" systems, we recommend reading our article:  [Build Pluggable Apps with Lenny the Duck 🦆](https://dev.to/codalreef/pluggable-apps-with-lenny-the-duck-2oj3)
 
 ### Pluggable Systems with DI
 
