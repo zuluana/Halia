@@ -268,6 +268,7 @@ If Paul longer wants the **🦄 Disco Duck 🦄**  we just don't register the Pl
 
 ### Features
 -  Plugin Configuration
+-  Plugin Factories / Plugin "Instances" (we can currently do this just building a Plugin before we build the stack)
 -  Consider exporting an Object OR specifically *a Plugin* from each Halia "Stack".
 
 ### Extensions
