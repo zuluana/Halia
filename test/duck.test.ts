@@ -4,7 +4,7 @@
 
 import { HaliaStack } from "../src/halia";
 import { DiscoDuckPlugin, DuckAppPlugin } from "./duck-app-plugins";
-import expect = require("expect");
+import { expect } from "chai";
 
 describe("Duck App", () => {
 
@@ -23,7 +23,7 @@ describe("Duck App", () => {
     const duckApp = appStack.getExports(DuckAppPlugin.id);
     const res = duckApp.getDuck();
 
-    expect(res).toEqual("Quack");
+    expect(res).equals("Quack");
   });
 
   it("should run the duck app with the disco plugin", async () => {
@@ -42,7 +42,7 @@ describe("Duck App", () => {
   const duckApp = appStack.getExports(DuckAppPlugin.id);
   const res = duckApp.getDuck();
 
-  expect(res).toEqual("Michael Quackson");
+  expect(res).equals("Michael Quackson");
 });
 });
 
