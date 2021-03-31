@@ -181,7 +181,7 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
 
         //  Check Installed
         if (child.isInstalled) {
-          throw `A child should not be installed before all parent dependencies are installed.`;
+          throw `A child (${ child.id }) was installed before all parent dependencies were installed.`;
         }
 
         //  Check Child Dependencies
