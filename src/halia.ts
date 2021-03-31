@@ -180,8 +180,9 @@ export class HaliaStack<T extends HaliaPlugin = HaliaPlugin> {
       for (const child of children) {
 
         //  Check Installed
+        //  NOTE:  It's possible for a node to depend on this node AND a child of this node.  Then, it will be installed at the child and should be skipped here.
         if (child.isInstalled) {
-          throw `A child (${ child.id }) was installed before all parent dependencies were installed.`;
+          continue;
         }
 
         //  Check Child Dependencies
