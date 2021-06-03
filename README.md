@@ -3,7 +3,7 @@
 # Halia
 
 ### Extensible TS / JS Dependency Injection Framework
->  Stop Spreading Features.  Build Apps as a Tree of Plugins.
+>  Write Less Code.  Play with Blocks 🧱
 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
@@ -11,7 +11,7 @@
 -  **Independent**:  Not coupled with a particular back-end or front-end technology.
 -  **Philosophy**:  Extensibility is a first-class concern as discussed in [Plugin Pattern](#plugin-pattern).
 
-Halia is a generic, extensible dependency injection (DI) framework.  However, we use it to generate apps at runtime using the [Plugin Pattern](#plugin-pattern).
+Halia is a generic, extensible dependency injection (DI) framework.  We use it to generate apps at runtime using the [Plugin Pattern](#plugin-pattern).
 
 Build "Plugins" to encapsulate and inject features into your app (or other plugins).  This keeps features simple, de-coupled, and open for extension.  
 
@@ -298,21 +298,19 @@ Halia also has an "install" step, which enables Plugins to change the functional
 
 Halia "Plugins" are similar to "Packages", and depending on your definition, Halia may be classified as a "Package Manager".  However, with the addition of runtime construction and first-class support for mutation, we feel the label "Plugin Manager" is more fitting.
 
-### Module Systems (like JS Modules) vs. Halia
+### Module Systems vs. Halia
 
 JS Modules is a "Module System" used to bundle code across the filesystem and map it to variables in the local scope (using "import" and "export" statements).
 
-In contrast, Halia automatically resolves dependencies between modules without the need to manually manage import order.  In addition, each Halia Plugin has a unique identifier which ensures it's registered as a singleton instance.
+You don't need Halia to manage dependencies or to implement the "Plugin Pattern".  But, we believe it offers several advantages over existing alternatives:
 
-You don't need Halia to manage dependencies or implement the "Plugin Pattern".  However, as the number of dependencies grows and use-cases evolve, several problems emerge:
+- **Dynamic Loading**:  The Halia module tree can be re-built at runtime after adding / removing modules.
+- **Asynchronous Loading**:  Halia modules can block instantiation with asynchronous code.
+- **Singletons**:  The Halia injection framework ensures only a single instantiation of each module.
+- **Multi-Dimensional**:  Halia is decoupled from the file-system.  Code elements can be injected and joined to a module from multiple places.
+- **Extensibility**:  Halia is built to be extended.  If you need one-off features in your module system, you can inject them without building a new module system.
+- **Introspection**:  We're building a suite of tools to visually and dynamically interact with Halia apps.  This means adding, removing, building, and configuring "Plugins" using graphical tools with a tight feedback loop.
 
--  **Import Order**:  You need to manage import order, which can become complex and difficult to refactor.
--  **Singleton Guarantee**:  There's no guarantee the loaded module is a Singleton.
--  **Dependency Verification**:  It's your responsibility to ensure dependencies are met prior to installation.
--  **Delayed Installation**:  You'll need to manually manage installation if it occurs after initial load.
--  **Dynamic Modification**: If the set of “Features” changes at runtime, you'll need to manage that change.  For example, verifying module compatibility.
-
-In Halia, the complete dependency graph is built at runtime, so there's no need to manually order them. Each Plugin has a unique ID associated with a singleton instance.  If the same ID is used twice, an error is thrown.  Halia Stacks can be built on-demand (and re-built) as needed.  This means, if the feature set changes at runtime, we can re-build the stack and run again.
 
 ###  Plugin Incompatibility
 
