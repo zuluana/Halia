@@ -3,7 +3,11 @@
 # Halia
 
 ### Extensible TS / JS Dependency Injection Framework
->  Write Less Code.  Play with Blocks 🧱
+>  Write Less Code and Play with Blocks 🧱
+
+Build (or use existing) "Plugins" to encapsulate and inject features into your app (or other plugins).  This keeps features simple, de-coupled, and open for extension.  
+
+Halia is a generic, extensible dependency injection (DI) framework.  We use it to generate apps at runtime using the [Plugin Pattern](#plugin-pattern).
 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
@@ -11,9 +15,7 @@
 -  **Independent**:  Not coupled with a particular back-end or front-end technology.
 -  **Philosophy**:  Extensibility is a first-class concern as discussed in [Plugin Pattern](#plugin-pattern).
 
-Halia is a generic, extensible dependency injection (DI) framework.  We use it to generate apps at runtime using the [Plugin Pattern](#plugin-pattern).
 
-Build "Plugins" to encapsulate and inject features into your app (or other plugins).  This keeps features simple, de-coupled, and open for extension.  
 
 ## 📖 Table of Contents
 - [Introduction](#halia)
