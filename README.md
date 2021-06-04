@@ -5,9 +5,9 @@
 ### Extensible TS / JS Dependency Injection Framework
 >  Write Less Code and Play with Blocks 🧱
 
-Build (or use existing) "Plugins" to encapsulate and inject features into your app (or other plugins).  This keeps features simple, de-coupled, and open for extension.  
+Use "Plugins" to encapsulate and inject features into your app (and other plugins).  This keeps features simple, de-coupled, and open for extension.  
 
-Halia is a generic, extensible dependency injection (DI) framework.  We use it to generate apps at runtime using the [Plugin Pattern](#plugin-pattern).
+Halia is a generic, extensible dependency injection (DI) framework.  We use it to generate ReactNative apps at runtime using the [Plugin Pattern](#plugin-pattern).
 
 -  **Extensible**:  Install extensions to customize the injector.
 -  **Tested**:  Test / Src Ratio (TSR): ~1/2.
@@ -27,7 +27,6 @@ Halia is a generic, extensible dependency injection (DI) framework.  We use it t
 - [Concepts](#concepts)
   - [Dependency Injection](#dependency-injection)
   - [Pluggable Systems](#plugin-based-architecture)
-  - [Pluggable Systems with DI](#pluggable-systems-with-di)
 - [Example](#example)
 - [Road Map](#road-map)
   - [Features](#features)
@@ -35,8 +34,11 @@ Halia is a generic, extensible dependency injection (DI) framework.  We use it t
 - [More Info](#more-info)
   - [Package Managers (like npm ) vs. Halia](#package-managers-like-npm--vs-halia)
   - [Module Systems (like JS Modules) vs. Halia](#module-systems-like-js-modules-vs-halia)
+  - [Pluggable Systems with DI](#pluggable-systems-with-di)
+  - [API Modification](#api-modification)
   - [Plugin Incompatibility](#plugin-incompatibility)
 - [Attribution](#attribution)
+
 
 
 ## Installation
@@ -54,9 +56,12 @@ Install with Yarn:
 
 ### Plugins
 
-Define a Plugin for each feature you wish to encapsulate.  You determine what each Plugin does and what API is exported for dependencies to use.
+Build a "HaliaPlugin" for each feature you wish to encapsulate.  
 
->  To Halia, the functional API exported by a Plugin is the sole integration point.  When manipulating a dependency, we recommend sticking to this functional interface and against direct manipulation when possible.  
+Each Plugin has an `install` function which is "injected" with the dependencies defined in the `dependencies` list.  
+
+Each Plugin also exports an API which will be injected downstream consuming plugins.
+
 
 ```typescript
 export const MyPlugin: HaliaPlugin = {
@@ -154,23 +159,6 @@ If you're new to Dependency Injection, we recommend reading our article:  [Learn
 
 If you're new to building "Pluggable" systems, we recommend reading our article:  [Build Pluggable Apps with Lenny the Duck 🦆](https://dev.to/codalreef/pluggable-apps-with-lenny-the-duck-2oj3)
 
-### Pluggable Systems with DI
-
-In a DI Framework, the state of each dependency is typically set on construction and (in many cases) it doesn't change much after that.  A function typically depends upon a module and it *uses* that module to accomplish a goal.
-
-However, when using DI to manage "Plugins", the *intention* is slightly different.  The dependencies will still be injected into each module, but instead of simply *using* these dependencies to accomplish a goal, we can also *modify* them.  Because modules in this pattern are expected to "plug" functionality into their dependencies, we call them "Plugins".
-
-Each dependency is still responsible for defining the initial API passed to its consumers.  With the Plugin Pattern, its not unexpected for the API methods to change the dependency's *state*, and / or the *exported API itself*.
-
-> With the introduction of API Modification, we make a distinction between the "API Contract" and "API".  The "API Contract" is a set of rules / conditions set by a Plugin, and it should remain unchanged.  The "API", which includes the exported member functions and their associated functionality, is expected to change (within the confines of the API Contract).
-
-We call a Plugin "stable" if it's contract is well-defined and unbreakable.  Conversely, if usage of a API can lead to a breach of contract (or the contract is ambiguous), we call the Plugin "unstable".  As long as a Plugin is stable, we can still predictably use and extend its API.
-
-It's possible to be explicit about which types of APIs a Plugin exports.  For example, one for *usage* and another for *modification*.  However, Halia doesn't make this distinction, and a Plugin can export an API which does any combination of these things.
-
-With this pattern, it becomes easy to mix, match, and build new features.  It's even possible to open your app for extension by external developers (like Wordpress does).
-
-
 ## Example
 You have a duck that everyone loves:
 
@@ -264,8 +252,6 @@ If Paul longer wants the **🦄 Disco Duck 🦄**  we just don't register the Pl
 
 >  This is a simple example that can be solved in other ways.  However, it demonstrates the general idea, and as features become more complex, we've found this pattern helps to keep things organized.
 
-
-]
 ##  Road Map
 
 ### Features
@@ -292,9 +278,7 @@ If Paul longer wants the **🦄 Disco Duck 🦄**  we just don't register the Pl
 
 ### Package Managers (like npm ) vs. Halia
 
-NPM is a "Package Manager" used to manages static, package-level dependencies which typically stay constant between runs.
-
-Halia also manages dependencies, but the dependency tree can be built on-demand at runtime, and typically between "Features" in the application domain, not static libraries used to build features.
+NPM is a "Package Manager" used to manage static dependencies.  Halia also manages dependencies, but the dependency tree can be built on-demand at runtime.
 
 Halia also has an "install" step, which enables Plugins to change the functionality of existing Plugins.
 
@@ -312,6 +296,24 @@ You don't need Halia to manage dependencies or to implement the "Plugin Pattern"
 - **Multi-Dimensional**:  Halia is decoupled from the file-system.  Code elements can be injected and joined to a module from multiple places.
 - **Extensibility**:  Halia is built to be extended.  If you need one-off features in your module system, you can inject them without building a new module system.
 - **Introspection**:  We're building a suite of tools to visually and dynamically interact with Halia apps.  This means adding, removing, building, and configuring "Plugins" using graphical tools with a tight feedback loop.
+
+### Pluggable Systems with DI
+
+In some cases, the the state of each dependency is set on construction, and it doesn't change much after that.  A function typically depends on a module and it *uses* that module to accomplish a goal.
+
+However, when using DI to manage "Plugins", the *intention* is slightly different.  The dependencies will still be injected into each module, but instead of simply *using* these dependencies to accomplish a goal, we can *modify* them.  Because modules in this pattern may "inject" functionality into their dependencies, we call them "Plugins".
+
+###  API Modification
+
+Each dependency is still responsible for defining the initial API passed to its consumers.  With the Plugin Pattern, its not unexpected for the API methods to change the dependency's *state*, and / or the *exported API itself*.
+
+> With the introduction of API Modification, we make a distinction between the "API Contract" and "API".  The "API Contract" is a set of rules / conditions set by a Plugin, and it should remain unchanged.  The "API", which includes the exported member functions and their associated functionality, is expected to change (within the confines of the API Contract).
+
+We call a Plugin "stable" if it's contract is well-defined and unbreakable.  Conversely, if usage of a API can lead to a breach of contract (or the contract is ambiguous), we call the Plugin "unstable".  As long as a Plugin is stable, we can still predictably use and extend its API.
+
+It's possible to be explicit about which types of APIs a Plugin exports.  For example, one for *usage* and another for *modification*.  However, Halia doesn't make this distinction, and a Plugin can export an API which does any combination of these things.
+
+With this pattern, it becomes easy to mix, match, and build new features.  It's even possible to open your app for extension by external developers (like Wordpress does).
 
 
 ###  Plugin Incompatibility
