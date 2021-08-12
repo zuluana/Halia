@@ -10,7 +10,6 @@
     "test": "mocha ./dist/test/**/*.test.js",
     "build-ts": "tsc --declaration",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "prepare": "npm run build",
     "tslint-fix": "tslint -c tslint.json -p tsconfig.json --fix"
   },
   "devDependencies": {
